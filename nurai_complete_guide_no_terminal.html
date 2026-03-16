@@ -1,0 +1,634 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#faf9f5;color:#0a0a08;font-size:13px;line-height:1.5}
+.layout{display:flex;height:600px}
+.sb{width:210px;background:#0a1f12;flex-shrink:0;overflow-y:auto;padding:12px 0}
+.sb::-webkit-scrollbar{width:3px}
+.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15)}
+.sb-hd{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.8px;padding:0 13px 8px;margin-top:4px}
+.si{display:flex;align-items:center;gap:8px;padding:6px 13px;cursor:pointer;transition:.15s;border-left:2px solid transparent}
+.si:hover{background:rgba(255,255,255,.05)}
+.si.on{background:rgba(42,122,76,.2);border-left-color:#3d9960}
+.si.done .sn{background:rgba(42,122,76,.4)!important;color:#6ee7a0!important}
+.si.done .sn::after{content:'✓'}
+.sn{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.4);flex-shrink:0;transition:.15s}
+.si.on .sn{background:#2a7a4c;color:#fff}
+.sl{font-size:11px;color:rgba(255,255,255,.5);line-height:1.3}
+.si.on .sl{color:#fff;font-weight:600}
+.sb-sep{height:1px;background:rgba(255,255,255,.07);margin:8px 13px}
+
+.main{flex:1;overflow-y:auto;height:600px}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:#e4e1d4}
+.sec{display:none;padding:0;animation:fi .2s ease}
+.sec.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* Header */
+.sh{background:#0a1f12;padding:16px 20px 14px;position:relative;overflow:hidden}
+.sh-bg{position:absolute;inset:0;opacity:.05;pointer-events:none}
+.sh-bg svg{width:100%;height:100%}
+.sh-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);border-radius:20px;padding:2px 9px;font-size:9px;font-weight:700;color:#e8c96a;letter-spacing:.5px;margin-bottom:6px;position:relative;z-index:1}
+.sh-title{font-size:17px;font-weight:700;color:#fff;position:relative;z-index:1;letter-spacing:-.3px}
+.sh-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;position:relative;z-index:1}
+
+/* Body */
+.body{padding:16px 18px 24px}
+
+/* Steps */
+.step{display:flex;gap:11px;margin-bottom:16px;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:13px;top:28px;bottom:-8px;width:1px;background:#e4e1d4}
+.snum{width:26px;height:26px;border-radius:50%;background:#2a7a4c;color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0;z-index:1}
+.snum.orange{background:#d97706}
+.snum.blue{background:#2563eb}
+.snum.purple{background:#7c3aed}
+.sbody{flex:1;min-width:0}
+.stitle{font-size:12px;font-weight:700;color:#0a0a08;margin-bottom:4px}
+.sdesc{font-size:11px;color:#6b6b60;line-height:1.6;margin-bottom:7px}
+
+/* Callouts */
+.info{background:#e8f5ee;border:1px solid #d0eedd;border-radius:8px;padding:8px 11px;font-size:11px;color:#1a5c38;display:flex;gap:7px;margin-bottom:7px;line-height:1.5}
+.warn{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 11px;font-size:11px;color:#92400e;display:flex;gap:7px;margin-bottom:7px;line-height:1.5}
+.err{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 11px;font-size:11px;color:#991b1b;display:flex;gap:7px;margin-bottom:7px;line-height:1.5}
+.note{background:#f2f0e8;border:1px solid #e4e1d4;border-radius:8px;padding:8px 11px;font-size:11px;color:#6b6b60;display:flex;gap:7px;margin-bottom:7px;line-height:1.5}
+
+/* Screenshot box */
+.ss{background:#f2f0e8;border:1px solid #e4e1d4;border-radius:9px;padding:9px 12px;margin-bottom:7px;display:flex;gap:8px}
+.ss-ic{font-size:15px;flex-shrink:0}
+.ss-txt{font-size:11px;color:#6b6b60;line-height:1.6;flex:1}
+.ss-txt strong{color:#0a0a08}
+.ss-txt code{background:#e4e1d4;padding:1px 5px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;color:#2a7a4c}
+
+/* Code */
+.code{background:#0a1f12;border-radius:8px;overflow:hidden;margin-bottom:7px}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:5px 11px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.07)}
+.cl{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px}
+.cc{font-size:9px;color:rgba(255,255,255,.35);cursor:pointer;background:none;border:none;font-family:inherit;transition:.15s;padding:0}
+.cc:hover{color:#6ee7a0}
+.code pre{padding:10px 11px;font-family:'DM Mono',monospace;font-size:10px;color:#a3e0c1;line-height:1.7;overflow-x:auto;white-space:pre}
+.code pre .c{color:rgba(255,255,255,.2)}
+.code pre .k{color:#e8c96a}
+.code pre .s{color:#fca5a5}
+.code pre .v{color:#93c5fd}
+
+/* File list */
+.flist{background:#f2f0e8;border:1px solid #e4e1d4;border-radius:8px;padding:9px 12px;margin-bottom:7px}
+.fitem{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px;border-bottom:1px solid #e4e1d4}
+.fitem:last-child{border-bottom:none}
+.fic{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.fn{font-family:'DM Mono',monospace;color:#0a0a08;flex:1;font-size:10px}
+.fd{font-size:10px;color:#a8a89a}
+
+/* Tag */
+.tag{display:inline-flex;padding:1px 7px;border-radius:20px;font-size:9px;font-weight:700}
+.tg{background:#dcfce7;color:#166534}.ta{background:#fef3c7;color:#92400e}.tr{background:#fee2e2;color:#991b1b}.tb{background:#dbeafe;color:#1e40af}.tp{background:#f3e8ff;color:#6b21a8}
+
+/* Config box */
+.cfg{background:#0a1f12;border-radius:8px;padding:12px;margin-bottom:7px}
+.cfg-row{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.cfg-row:last-child{border-bottom:none}
+.cfg-k{font-family:'DM Mono',monospace;font-size:10px;color:#e8c96a;width:120px;flex-shrink:0;padding-top:1px}
+.cfg-v{font-size:10px;color:rgba(255,255,255,.6);line-height:1.5}
+.cfg-v code{color:#a3e0c1;font-family:'DM Mono',monospace}
+
+/* Checklist */
+.cklist{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.ck{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid #e4e1d4;background:#fff;cursor:pointer;transition:.15s}
+.ck:hover{border-color:#d0eedd}
+.ck.checked{border-color:#d0eedd;background:#e8f5ee}
+.ck-box{width:16px;height:16px;border-radius:4px;border:1.5px solid #e4e1d4;flex-shrink:0;margin-top:1px;display:grid;place-items:center;font-size:9px;font-weight:700;transition:.15s}
+.ck.checked .ck-box{background:#2a7a4c;border-color:#2a7a4c;color:#fff}
+.ck-t{font-size:11px;font-weight:600;color:#0a0a08;margin-bottom:1px}
+.ck-d{font-size:10px;color:#a8a89a;line-height:1.5}
+
+/* Nav */
+.navrow{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid #e4e1d4}
+.nbtn{display:flex;align-items:center;gap:5px;padding:8px 16px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:.2s}
+.nprev{background:#f2f0e8;color:#6b6b60}.nprev:hover{background:#e4e1d4}
+.nnext{background:#2a7a4c;color:#fff}.nnext:hover{background:#1a5c38}
+.nprog{font-size:10px;color:#a8a89a}
+
+/* Section divider label */
+.sdlbl{display:flex;align-items:center;gap:8px;font-size:9px;font-weight:700;color:#a8a89a;text-transform:uppercase;letter-spacing:.7px;margin:14px 0 10px}
+.sdlbl::before,.sdlbl::after{content:'';flex:1;height:0.5px;background:#e4e1d4}
+
+/* Summary table */
+.stbl{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px}
+.stbl th{background:#0a1f12;color:rgba(255,255,255,.6);padding:6px 10px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.stbl td{padding:7px 10px;border-bottom:1px solid #e4e1d4;color:#2d2d28;vertical-align:top}
+.stbl tr:last-child td{border-bottom:none}
+.stbl tr:nth-child(even) td{background:#f9f9f8}
+</style>
+
+<div class="layout">
+<div class="sb">
+  <div class="sb-hd">Panduan Lengkap</div>
+
+  <div class="sb-hd" style="margin-top:4px;color:rgba(255,165,0,.4)">▸ BAGIAN A — BACKEND</div>
+  <div class="si on" onclick="g(0)"><div class="sn" id="n0">1</div><div class="sl">Persiapan File</div></div>
+  <div class="si" onclick="g(1)"><div class="sn" id="n1">2</div><div class="sl">GitHub — Buat Repo</div></div>
+  <div class="si" onclick="g(2)"><div class="sn" id="n2">3</div><div class="sl">GitHub — Upload File</div></div>
+  <div class="si" onclick="g(3)"><div class="sn" id="n3">4</div><div class="sl">HF Spaces — Buat Akun</div></div>
+  <div class="si" onclick="g(4)"><div class="sn" id="n4">5</div><div class="sl">HF Spaces — Buat Space</div></div>
+  <div class="si" onclick="g(5)"><div class="sn" id="n5">6</div><div class="sl">HF — Sambungkan GitHub</div></div>
+  <div class="si" onclick="g(6)"><div class="sn" id="n6">7</div><div class="sl">OpenAI Key & Secret</div></div>
+  <div class="si" onclick="g(7)"><div class="sn" id="n7">8</div><div class="sl">Test Backend</div></div>
+
+  <div class="sb-sep"></div>
+  <div class="sb-hd" style="color:rgba(255,165,0,.4)">▸ BAGIAN B — FIREBASE</div>
+  <div class="si" onclick="g(8)"><div class="sn" id="n8">9</div><div class="sl">Firebase — Buat Project</div></div>
+  <div class="si" onclick="g(9)"><div class="sn" id="n9">10</div><div class="sl">Firebase — Google Auth</div></div>
+  <div class="si" onclick="g(10)"><div class="sn" id="n10">11</div><div class="sl">Firebase — Firestore DB</div></div>
+  <div class="si" onclick="g(11)"><div class="sn" id="n11">12</div><div class="sl">Pasang Config ke NurAI</div></div>
+
+  <div class="sb-sep"></div>
+  <div class="sb-hd" style="color:rgba(255,165,0,.4)">▸ BAGIAN C — LAUNCH</div>
+  <div class="si" onclick="g(12)"><div class="sn" id="n12">13</div><div class="sl">Sambungkan Semua</div></div>
+  <div class="si" onclick="g(13)"><div class="sn" id="n13">14</div><div class="sl">Deploy ke Netlify</div></div>
+  <div class="si" onclick="g(14)"><div class="sn" id="n14">✓</div><div class="sl">Ceklis Final & Launch</div></div>
+</div>
+
+<div class="main" id="mc">
+
+<!-- 0 -->
+<div class="sec on" id="s0">
+<div class="sh"><div class="sh-bg"><svg viewBox="0 0 400 100" fill="none"><polygon points="50,10 150,60 150,90 50,90" stroke="#c9a84c" stroke-width=".4" fill="none" opacity=".5"/></svg></div>
+<div class="sh-pill">LANGKAH 1</div>
+<div class="sh-title">Persiapan — Download File NurAI</div>
+<div class="sh-sub">Kumpulkan semua file yang akan di-upload · Tidak perlu install apapun dulu</div></div>
+<div class="body">
+
+<div class="info"><span>💡</span><span><strong>Kabar baik!</strong> Untuk upload ke GitHub kamu tidak perlu install Git atau buka terminal sama sekali. Semua bisa dilakukan lewat browser!</span></div>
+
+<div class="step">
+<div class="snum">1</div>
+<div class="sbody">
+<div class="stitle">Download semua file dari chat ini</div>
+<div class="sdesc">Dari percakapan ini, download file-file berikut dan simpan di satu folder (misal: Desktop/NurAI):</div>
+<div class="flist">
+  <div class="fitem"><div class="fic" style="background:#2a7a4c">PY</div><div class="fn">main-hf.py</div><div class="fd">Backend Whisper API</div></div>
+  <div class="fitem"><div class="fic" style="background:#0369a1">🐳</div><div class="fn">Dockerfile</div><div class="fd">Konfigurasi container</div></div>
+  <div class="fitem"><div class="fic" style="background:#6b21a8">JS</div><div class="fn">whisper-client-hf.js</div><div class="fd">Client untuk NurAI App</div></div>
+  <div class="fitem"><div class="fic" style="background:#92400e">MD</div><div class="fn">README-whisper.md</div><div class="fd">Deskripsi project</div></div>
+  <div class="fitem"><div class="fic" style="background:#1a5c38">TXT</div><div class="fn">requirements.txt</div><div class="fd">Daftar library Python</div></div>
+  <div class="fitem"><div class="fic" style="background:#166534">HTML</div><div class="fn">NurAI-App.html</div><div class="fd">Aplikasi utama NurAI</div></div>
+</div>
+</div></div>
+
+<div class="step">
+<div class="snum">2</div>
+<div class="sbody">
+<div class="stitle">Rename satu file</div>
+<div class="sdesc">Hugging Face butuh file README dengan nama persis <code>README.md</code></div>
+<div class="ss"><div class="ss-ic">✏️</div><div class="ss-txt">Klik kanan file <code>README-whisper.md</code> → Rename → ganti nama menjadi <strong>README.md</strong></div></div>
+<div class="warn"><span>⚠️</span><span>Juga rename <code>main-hf.py</code> → <code>main.py</code>. HF Spaces mencari file bernama tepat <code>main.py</code>.</span></div>
+</div></div>
+
+<div class="step">
+<div class="snum">3</div>
+<div class="sbody">
+<div class="stitle">Folder kamu seharusnya berisi 6 file ini:</div>
+<div class="flist">
+  <div class="fitem"><div class="fic" style="background:#2a7a4c">✓</div><div class="fn">main.py</div><div class="fd">sudah di-rename</div></div>
+  <div class="fitem"><div class="fic" style="background:#0369a1">✓</div><div class="fn">Dockerfile</div><div class="fd">nama tetap</div></div>
+  <div class="fitem"><div class="fic" style="background:#6b21a8">✓</div><div class="fn">whisper-client-hf.js</div><div class="fd">nama tetap</div></div>
+  <div class="fitem"><div class="fic" style="background:#92400e">✓</div><div class="fn">README.md</div><div class="fd">sudah di-rename</div></div>
+  <div class="fitem"><div class="fic" style="background:#1a5c38">✓</div><div class="fn">requirements.txt</div><div class="fd">nama tetap</div></div>
+</div>
+<div class="note"><span>📝</span><span><code>NurAI-App.html</code> dan <code>whisper-client-hf.js</code> nanti di-upload ke Netlify (bukan GitHub repo backend). Pisahkan dulu.</span></div>
+</div></div>
+
+<div class="navrow"><div></div><div class="nprog">1 dari 15</div><button class="nbtn nnext" onclick="g(1)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 1 -->
+<div class="sec" id="s1">
+<div class="sh"><div class="sh-pill">LANGKAH 2</div><div class="sh-title">GitHub — Buat Akun & Repository</div><div class="sh-sub">GitHub = tempat kode tersimpan online · Gratis selamanya</div></div>
+<div class="body">
+
+<div class="info"><span>💡</span><span>Sudah punya akun GitHub? Langsung lanjut ke <strong>Buat Repository</strong> di bawah.</span></div>
+
+<div class="sdlbl">Buat Akun GitHub</div>
+
+<div class="step">
+<div class="snum">1</div>
+<div class="sbody">
+<div class="stitle">Daftar di github.com</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Buka <strong>github.com/signup</strong> → isi email, password, username → klik <strong>Create account</strong> → verifikasi email</div></div>
+<div class="ss"><div class="ss-ic">👤</div><div class="ss-txt">Pilih username yang mudah diingat, misal: <code>ahmad-nurai</code> atau nama kamu. Username ini akan jadi bagian URL backend nanti.</div></div>
+</div></div>
+
+<div class="sdlbl">Buat Repository Baru</div>
+
+<div class="step">
+<div class="snum">2</div>
+<div class="sbody">
+<div class="stitle">Buat repository untuk backend</div>
+<div class="ss"><div class="ss-ic">➕</div><div class="ss-txt">Setelah login → klik tanda <strong>"+"</strong> di pojok kanan atas → pilih <strong>"New repository"</strong></div></div>
+<div class="cfg">
+  <div class="cfg-row"><div class="cfg-k">Repository name</div><div class="cfg-v"><code>nurai-whisper-api</code></div></div>
+  <div class="cfg-row"><div class="cfg-k">Visibility</div><div class="cfg-v">✅ <strong>Public</strong> — wajib agar HF bisa akses</div></div>
+  <div class="cfg-row"><div class="cfg-k">Initialize README</div><div class="cfg-v">❌ Jangan centang — kita upload README sendiri</div></div>
+  <div class="cfg-row"><div class="cfg-k">Lainnya</div><div class="cfg-v">Biarkan default semua</div></div>
+</div>
+<div class="ss"><div class="ss-ic">✅</div><div class="ss-txt">Klik tombol hijau <strong>"Create repository"</strong> → kamu masuk ke halaman repo kosong</div></div>
+<div class="info"><span>💡</span><span>Di halaman repo kosong akan terlihat instruksi git — <strong>abaikan saja</strong>, kita tidak pakai terminal. Langsung lanjut ke upload file.</span></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(0)">← Kembali</button><div class="nprog">2 dari 15</div><button class="nbtn nnext" onclick="g(2)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 2 -->
+<div class="sec" id="s2">
+<div class="sh"><div class="sh-pill">LANGKAH 3</div><div class="sh-title">GitHub — Upload File (Tanpa Terminal!)</div><div class="sh-sub">Drag & drop langsung di browser GitHub · Semudah upload foto</div></div>
+<div class="body">
+
+<div class="step">
+<div class="snum">1</div>
+<div class="sbody">
+<div class="stitle">Buka halaman upload di GitHub</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Di halaman repo yang baru dibuat → klik link <strong>"uploading an existing file"</strong> yang ada di tengah halaman. Atau klik tombol <strong>"Add file"</strong> → <strong>"Upload files"</strong></div></div>
+</div></div>
+
+<div class="step">
+<div class="snum">2</div>
+<div class="sbody">
+<div class="stitle">Upload 5 file backend sekaligus</div>
+<div class="ss"><div class="ss-ic">🖱️</div><div class="ss-txt">Buka folder NurAI di File Explorer/Finder → pilih <strong>5 file backend</strong> (bukan NurAI-App.html):<br><code>main.py</code> · <code>Dockerfile</code> · <code>requirements.txt</code> · <code>README.md</code> · <code>whisper-client-hf.js</code></div></div>
+<div class="ss"><div class="ss-ic">🖱️</div><div class="ss-txt"><strong>Drag semua 5 file sekaligus</strong> ke area abu-abu bertuliskan "Drag files here to add them" di halaman GitHub. Atau klik "choose your files" untuk pilih manual.</div></div>
+<div class="ss"><div class="ss-ic">👀</div><div class="ss-txt">Tunggu upload selesai — akan muncul daftar 5 file dengan checkmark hijau. Kalau ada yang gagal, upload ulang file tersebut saja.</div></div>
+</div></div>
+
+<div class="step">
+<div class="snum">3</div>
+<div class="sbody">
+<div class="stitle">Commit (simpan) file</div>
+<div class="ss"><div class="ss-ic">📝</div><div class="ss-txt">Scroll ke bawah → di bagian <strong>"Commit changes"</strong>, isi pesan commit: <code>NurAI backend initial upload</code></div></div>
+<div class="ss"><div class="ss-ic">✅</div><div class="ss-txt">Klik tombol hijau <strong>"Commit changes"</strong> → halaman akan reload dan semua 5 file terlihat di repo ✅</div></div>
+</div></div>
+
+<div class="step">
+<div class="snum">4</div>
+<div class="sbody">
+<div class="stitle">Verifikasi</div>
+<div class="ss"><div class="ss-ic">👀</div><div class="ss-txt">Pastikan di repo terlihat persis 5 file ini. Kalau ada yang kurang, klik "Add file" → "Upload files" lagi untuk tambah.</div></div>
+<div class="flist">
+  <div class="fitem"><div class="fic" style="background:#2a7a4c">✓</div><div class="fn">main.py</div></div>
+  <div class="fitem"><div class="fic" style="background:#0369a1">✓</div><div class="fn">Dockerfile</div></div>
+  <div class="fitem"><div class="fic" style="background:#6b21a8">✓</div><div class="fn">whisper-client-hf.js</div></div>
+  <div class="fitem"><div class="fic" style="background:#92400e">✓</div><div class="fn">README.md</div></div>
+  <div class="fitem"><div class="fic" style="background:#1a5c38">✓</div><div class="fn">requirements.txt</div></div>
+</div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(1)">← Kembali</button><div class="nprog">3 dari 15</div><button class="nbtn nnext" onclick="g(3)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 3 -->
+<div class="sec" id="s3">
+<div class="sh"><div class="sh-pill">LANGKAH 4</div><div class="sh-title">Hugging Face — Buat Akun & Token</div><div class="sh-sub">Gratis, tidak perlu kartu kredit</div></div>
+<div class="body">
+<div class="info"><span>💡</span><span>Sudah punya akun HF? Langsung ke bagian <strong>Buat Token</strong> di bawah.</span></div>
+
+<div class="step"><div class="snum">1</div><div class="sbody">
+<div class="stitle">Daftar Hugging Face</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Buka <strong>huggingface.co/join</strong> → isi email, password, username → klik Register → verifikasi email</div></div>
+</div></div>
+
+<div class="step"><div class="snum">2</div><div class="sbody">
+<div class="stitle">Buat Access Token (untuk sambungkan ke GitHub nanti)</div>
+<div class="ss"><div class="ss-ic">⚙️</div><div class="ss-txt">Login → klik foto profil kanan atas → <strong>Settings</strong> → di menu kiri pilih <strong>Access Tokens</strong></div></div>
+<div class="ss"><div class="ss-ic">➕</div><div class="ss-txt">Klik <strong>New token</strong> → Name: <code>nurai-deploy</code> → Role: <strong>Write</strong> → klik <strong>Generate a token</strong></div></div>
+<div class="ss"><div class="ss-ic">📋</div><div class="ss-txt">Token muncul sekali: <code>hf_xxxxxxxxxxxxxxxxxx</code><br><strong>Copy dan simpan di Notepad</strong> — tidak akan ditampilkan lagi!</div></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(2)">← Kembali</button><div class="nprog">4 dari 15</div><button class="nbtn nnext" onclick="g(4)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 4 -->
+<div class="sec" id="s4">
+<div class="sh"><div class="sh-pill">LANGKAH 5</div><div class="sh-title">HF Spaces — Buat Space Baru</div><div class="sh-sub">Space = server gratis tempat backend NurAI berjalan 24/7</div></div>
+<div class="body">
+
+<div class="step"><div class="snum">1</div><div class="sbody">
+<div class="stitle">Buat Space baru</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Login HF → klik <strong>Spaces</strong> di navbar atas → klik <strong>Create new Space</strong></div></div>
+<div class="cfg">
+  <div class="cfg-row"><div class="cfg-k">Space name</div><div class="cfg-v"><code>nurai-whisper</code></div></div>
+  <div class="cfg-row"><div class="cfg-k">SDK</div><div class="cfg-v" style="color:#fca5a5"><strong>Docker</strong> ← WAJIB! Jangan pilih lain</div></div>
+  <div class="cfg-row"><div class="cfg-k">Visibility</div><div class="cfg-v">Public (gratis)</div></div>
+  <div class="cfg-row"><div class="cfg-k">License</div><div class="cfg-v">MIT</div></div>
+</div>
+<div class="warn"><span>⚠️</span><span>SDK <strong>HARUS Docker</strong> bukan Gradio/Streamlit. Kalau salah, hapus Space dan buat ulang.</span></div>
+<div class="ss"><div class="ss-ic">✅</div><div class="ss-txt">Klik <strong>Create Space</strong> → Space kosong berhasil dibuat</div></div>
+</div></div>
+
+<div class="step"><div class="snum">2</div><div class="sbody">
+<div class="stitle">Catat URL API kamu</div>
+<div class="ss"><div class="ss-ic">🔗</div><div class="ss-txt">URL API backend NurAI kamu adalah:<br><strong>https://USERNAME_HF-nurai-whisper.hf.space</strong><br><br>Contoh jika username HF = <code>ahmad123</code>:<br><code>https://ahmad123-nurai-whisper.hf.space</code><br><br>Simpan URL ini — dipakai di langkah 13.</div></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(3)">← Kembali</button><div class="nprog">5 dari 15</div><button class="nbtn nnext" onclick="g(5)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 5 -->
+<div class="sec" id="s5">
+<div class="sh"><div class="sh-pill">LANGKAH 6</div><div class="sh-title">Sambungkan GitHub → HF Space</div><div class="sh-sub">HF otomatis baca kode dari GitHub dan build server · Bisa tanpa terminal!</div></div>
+<div class="body">
+
+<div class="step"><div class="snum">1</div><div class="sbody">
+<div class="stitle">Cara A — Lewat web HF (tanpa terminal, paling mudah)</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Di halaman Space kamu → klik tab <strong>"Files"</strong> → klik <strong>"Add file"</strong> → <strong>"Upload files"</strong></div></div>
+<div class="ss"><div class="ss-ic">🖱️</div><div class="ss-txt">Upload <strong>5 file backend</strong> yang sama persis dengan yang di GitHub:<br><code>main.py</code> · <code>Dockerfile</code> · <code>requirements.txt</code> · <code>README.md</code> · <code>whisper-client-hf.js</code></div></div>
+<div class="ss"><div class="ss-ic">💾</div><div class="ss-txt">Klik <strong>Commit changes to main</strong> → HF Space langsung mulai build otomatis!</div></div>
+<div class="info"><span>✅</span><span>Ini cara paling mudah! Tidak perlu terminal sama sekali. Cocok untuk pemula.</span></div>
+</div></div>
+
+<div class="step"><div class="snum">2</div><div class="sbody">
+<div class="stitle">Monitor proses build</div>
+<div class="ss"><div class="ss-ic">👀</div><div class="ss-txt">Di halaman Space → klik tab <strong>"Logs"</strong> → lihat proses build secara live</div></div>
+<div class="ss"><div class="ss-ic">⏳</div><div class="ss-txt">Build pertama: <strong>3–5 menit</strong>. Status: <span class="tag ta">Building</span> → <span class="tag tb">Starting</span> → <span class="tag tg">Running</span></div></div>
+<div class="err"><span>❌</span><span>Jika <span class="tag tr">Build error</span>: klik Logs → cari baris merah → paling umum karena Dockerfile atau nama file salah. Screenshot dan kirim ke saya.</span></div>
+</div></div>
+
+<div class="note"><span>📌</span><span><strong>Update kode di masa depan:</strong> Upload ulang file yang berubah ke tab Files di HF Space (sama persis seperti langkah di atas). Space langsung rebuild otomatis.</span></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(4)">← Kembali</button><div class="nprog">6 dari 15</div><button class="nbtn nnext" onclick="g(6)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 6 -->
+<div class="sec" id="s6">
+<div class="sh"><div class="sh-pill">LANGKAH 7</div><div class="sh-title">OpenAI Key + Set Secret di HF</div><div class="sh-sub">Dua sub-langkah: dapat key → masukkan ke HF aman</div></div>
+<div class="body">
+
+<div class="sdlbl">Bagian A — Dapat OpenAI API Key</div>
+<div class="step"><div class="snum orange">A</div><div class="sbody">
+<div class="stitle">Daftar & buat key di OpenAI</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Buka <strong>platform.openai.com</strong> → Sign up (atau Login)</div></div>
+<div class="ss"><div class="ss-ic">🎁</div><div class="ss-txt">Akun baru otomatis dapat <strong>$5 kredit gratis</strong> = 833 menit Whisper tanpa bayar</div></div>
+<div class="ss"><div class="ss-ic">🔑</div><div class="ss-txt">Klik nama profil → <strong>API Keys</strong> → <strong>Create new secret key</strong> → Name: <code>NurAI</code> → Create</div></div>
+<div class="ss"><div class="ss-ic">📋</div><div class="ss-txt">Copy key: <code>sk-proj-xxxxxxxxxx</code> → simpan di Notepad. Hanya ditampilkan SEKALI!</div></div>
+</div></div>
+
+<div class="sdlbl">Bagian B — Masukkan Key ke HF Space (dengan aman)</div>
+<div class="step"><div class="snum orange">B</div><div class="sbody">
+<div class="stitle">Set Secret di HF Space</div>
+<div class="ss"><div class="ss-ic">⚙️</div><div class="ss-txt">Buka Space kamu → tab <strong>Settings</strong> → scroll ke <strong>"Variables and secrets"</strong></div></div>
+<div class="ss"><div class="ss-ic">➕</div><div class="ss-txt">Klik <strong>New secret</strong> → isi:</div></div>
+<div class="cfg">
+  <div class="cfg-row"><div class="cfg-k">Name</div><div class="cfg-v"><code>OPENAI_API_KEY</code> ← huruf besar semua, persis ini</div></div>
+  <div class="cfg-row"><div class="cfg-k">Value</div><div class="cfg-v">paste <code>sk-proj-xxxxx</code> kamu di sini</div></div>
+</div>
+<div class="ss"><div class="ss-ic">💾</div><div class="ss-txt">Klik <strong>Save</strong> → Space restart otomatis ~30 detik</div></div>
+<div class="info"><span>🔐</span><span>Secret tersimpan terenkripsi di server HF. Tidak ada yang bisa lihat nilainya, termasuk kamu sendiri setelah disimpan. Aman!</span></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(5)">← Kembali</button><div class="nprog">7 dari 15</div><button class="nbtn nnext" onclick="g(7)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 7 -->
+<div class="sec" id="s7">
+<div class="sh"><div class="sh-pill">LANGKAH 8</div><div class="sh-title">Test Backend — Pastikan Berjalan</div><div class="sh-sub">3 URL untuk dicek sebelum lanjut ke Firebase</div></div>
+<div class="body">
+<div class="cklist">
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)">
+    <div class="ck-box"></div><div><div class="ck-t">Cek 1 — Landing page muncul</div><div class="ck-d">Buka: https://USERNAME-nurai-whisper.hf.space → harus muncul halaman hijau "NurAI Online"</div></div>
+  </div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)">
+    <div class="ck-box"></div><div><div class="ck-t">Cek 2 — OpenAI terkonfigurasi</div><div class="ck-d">Buka: .../health → harus ada "openai_configured": true</div></div>
+  </div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)">
+    <div class="ck-box"></div><div><div class="ck-t">Cek 3 — Swagger docs berjalan</div><div class="ck-d">Buka: .../docs → harus muncul Swagger UI dengan POST /analyze</div></div>
+  </div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)">
+    <div class="ck-box"></div><div><div class="ck-t">Cek 4 — Test data ayat</div><div class="ck-d">Buka: .../test/1/7 → harus muncul JSON Ayat 7 Al-Fatihah</div></div>
+  </div>
+</div>
+<div class="info"><span>✅</span><span>Semua 4 cek centang? Backend siap! Sekarang lanjut setup Firebase untuk Google Login.</span></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(6)">← Kembali</button><div class="nprog">8 dari 15</div><button class="nbtn nnext" onclick="g(8)">Selanjutnya: Firebase →</button></div>
+</div></div>
+
+<!-- 8 — FIREBASE PROJECT -->
+<div class="sec" id="s8">
+<div class="sh"><div class="sh-pill">LANGKAH 9 · FIREBASE</div><div class="sh-title">Firebase — Buat Project & Daftarkan App</div><div class="sh-sub">Firebase = Google Login + simpan skor ke cloud · Gratis untuk app kecil</div></div>
+<div class="body">
+
+<div class="step"><div class="snum blue">1</div><div class="sbody">
+<div class="stitle">Buat project Firebase baru</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Buka <strong>console.firebase.google.com</strong> → login dengan akun Google → klik <strong>Add project</strong></div></div>
+<div class="ss"><div class="ss-ic">📝</div><div class="ss-txt">Nama project: <code>nurai-quran</code> → klik Continue → <strong>Disable</strong> Google Analytics (tidak perlu) → klik <strong>Create project</strong></div></div>
+<div class="ss"><div class="ss-ic">⏳</div><div class="ss-txt">Tunggu ~30 detik → klik <strong>Continue</strong> → masuk ke Firebase Console</div></div>
+</div></div>
+
+<div class="step"><div class="snum blue">2</div><div class="sbody">
+<div class="stitle">Daftarkan Web App & dapat firebaseConfig</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Di dashboard → klik ikon <strong>&lt;/&gt;</strong> (Web) di bagian "Your apps"</div></div>
+<div class="ss"><div class="ss-ic">📝</div><div class="ss-txt">App nickname: <code>NurAI Web</code> → centang <strong>"Firebase Hosting"</strong> → klik <strong>Register app</strong></div></div>
+<div class="ss"><div class="ss-ic">📋</div><div class="ss-txt">Akan muncul kode <code>firebaseConfig</code>. <strong>COPY semua teks ini</strong> dan simpan di Notepad:</div></div>
+<div class="code"><div class="ch"><span class="cl">Yang akan muncul — copy semua nilainya</span></div><pre><span class="k">const</span> firebaseConfig = {
+  apiKey:            <span class="s">"AIzaSy..."</span>,
+  authDomain:        <span class="s">"nurai-quran.firebaseapp.com"</span>,
+  projectId:         <span class="s">"nurai-quran"</span>,
+  storageBucket:     <span class="s">"nurai-quran.appspot.com"</span>,
+  messagingSenderId: <span class="s">"123456789"</span>,
+  appId:             <span class="s">"1:123:web:abc123"</span>
+};</pre></div>
+<div class="warn"><span>⚠️</span><span>Klik <strong>Continue to console</strong> setelah copy — jangan tutup halaman sebelum copy config!</span></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(7)">← Kembali</button><div class="nprog">9 dari 15</div><button class="nbtn nnext" onclick="g(9)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 9 — FIREBASE AUTH -->
+<div class="sec" id="s9">
+<div class="sh"><div class="sh-pill">LANGKAH 10 · FIREBASE</div><div class="sh-title">Firebase — Aktifkan Google Login</div><div class="sh-sub">5 klik dan Google Login siap</div></div>
+<div class="body">
+
+<div class="step"><div class="snum blue">1</div><div class="sbody">
+<div class="stitle">Aktifkan Authentication</div>
+<div class="ss"><div class="ss-ic">🔐</div><div class="ss-txt">Di Firebase Console → menu kiri klik <strong>Authentication</strong> → klik <strong>Get started</strong></div></div>
+<div class="ss"><div class="ss-ic">📋</div><div class="ss-txt">Klik tab <strong>Sign-in method</strong> → klik <strong>Google</strong> di daftar provider</div></div>
+<div class="ss"><div class="ss-ic">🔘</div><div class="ss-txt">Toggle <strong>Enable</strong> → isi <strong>Project support email</strong> (email kamu) → klik <strong>Save</strong></div></div>
+<div class="info"><span>✅</span><span>Google Login sekarang aktif! Pengguna bisa login dengan akun Google mereka.</span></div>
+</div></div>
+
+<div class="step"><div class="snum blue">2</div><div class="sbody">
+<div class="stitle">Tambahkan domain Netlify ke Authorized Domains</div>
+<div class="sdesc">Ini WAJIB agar Google Login bisa dipakai dari URL Netlify kamu.</div>
+<div class="ss"><div class="ss-ic">⚙️</div><div class="ss-txt">Di Authentication → tab <strong>Settings</strong> → scroll ke <strong>Authorized domains</strong></div></div>
+<div class="ss"><div class="ss-ic">➕</div><div class="ss-txt">Klik <strong>Add domain</strong> → masukkan domain Netlify kamu: <code>xxxx.netlify.app</code> → klik Add<br><br>Lakukan ini lagi untuk domain HF Space: <code>USERNAME-nurai-whisper.hf.space</code></div></div>
+<div class="warn"><span>⚠️</span><span>Kalau domain belum ditambahkan, Google Login akan error "auth/unauthorized-domain". Ini penyebab #1 login gagal!</span></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(8)">← Kembali</button><div class="nprog">10 dari 15</div><button class="nbtn nnext" onclick="g(10)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 10 — FIRESTORE -->
+<div class="sec" id="s10">
+<div class="sh"><div class="sh-pill">LANGKAH 11 · FIREBASE</div><div class="sh-title">Firebase — Buat Database Firestore</div><div class="sh-sub">Tempat skor tajwid & data pengguna tersimpan di cloud</div></div>
+<div class="body">
+
+<div class="step"><div class="snum blue">1</div><div class="sbody">
+<div class="stitle">Buat Firestore Database</div>
+<div class="ss"><div class="ss-ic">🗄️</div><div class="ss-txt">Firebase Console → menu kiri klik <strong>Firestore Database</strong> → klik <strong>Create database</strong></div></div>
+<div class="ss"><div class="ss-ic">🔒</div><div class="ss-txt">Pilih <strong>Start in test mode</strong> → klik Next<br><span class="tag ta">Test mode</span> artinya semua orang bisa baca/tulis — OK untuk development. Nanti bisa diubah ke production rules.</div></div>
+<div class="ss"><div class="ss-ic">🌏</div><div class="ss-txt">Pilih region: <strong>asia-southeast2 (Jakarta)</strong> untuk koneksi tercepat dari Indonesia → klik <strong>Enable</strong></div></div>
+<div class="ss"><div class="ss-ic">⏳</div><div class="ss-txt">Tunggu ~30 detik → Firestore siap! Akan terlihat halaman database kosong.</div></div>
+</div></div>
+
+<div class="step"><div class="snum blue">2</div><div class="sbody">
+<div class="stitle">Struktur data yang akan tersimpan otomatis</div>
+<div class="flist">
+  <div class="fitem"><div class="fic" style="background:#2563eb">📁</div><div class="fn">users/{uid}</div><div class="fd">nama, email, lastLogin</div></div>
+  <div class="fitem"><div class="fic" style="background:#7c3aed">📁</div><div class="fn">scores/{uid_surah_ayah}</div><div class="fd">skor per ayat per pengguna</div></div>
+</div>
+<div class="info"><span>💡</span><span>Kode NurAI sudah otomatis menyimpan ke struktur ini setiap kali pengguna login atau rekam ayat.</span></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(9)">← Kembali</button><div class="nprog">11 dari 15</div><button class="nbtn nnext" onclick="g(11)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 11 — PASANG CONFIG -->
+<div class="sec" id="s11">
+<div class="sh"><div class="sh-pill">LANGKAH 12 · FIREBASE</div><div class="sh-title">Pasang Firebase Config ke NurAI-App.html</div><div class="sh-sub">Edit 6 baris di file HTML · 2 menit</div></div>
+<div class="body">
+
+<div class="step"><div class="snum blue">1</div><div class="sbody">
+<div class="stitle">Buka NurAI-App.html di Notepad/VS Code</div>
+<div class="ss"><div class="ss-ic">🔍</div><div class="ss-txt">Tekan <strong>Ctrl+F</strong> → cari teks: <code>GANTI_DENGAN_API_KEY</code></div></div>
+<div class="ss"><div class="ss-ic">✏️</div><div class="ss-txt">Kamu akan menemukan bagian <code>FIREBASE_CONFIG</code>. Ganti setiap nilai <code>"GANTI_..."</code> dengan nilai dari config yang tadi dicopy:</div></div>
+<div class="code"><div class="ch"><span class="cl">Di NurAI-App.html — ganti 6 nilai ini</span></div><pre><span class="k">const</span> FIREBASE_CONFIG = {
+  apiKey:            <span class="s">"AIzaSy..."</span>, <span class="c">← ganti</span>
+  authDomain:        <span class="s">"nurai-quran.firebaseapp.com"</span>, <span class="c">← ganti</span>
+  projectId:         <span class="s">"nurai-quran"</span>, <span class="c">← ganti</span>
+  storageBucket:     <span class="s">"nurai-quran.appspot.com"</span>, <span class="c">← ganti</span>
+  messagingSenderId: <span class="s">"123456789"</span>, <span class="c">← ganti</span>
+  appId:             <span class="s">"1:123:web:abc"</span> <span class="c">← ganti</span>
+};</pre></div>
+<div class="ss"><div class="ss-ic">💾</div><div class="ss-txt">Simpan file (Ctrl+S)</div></div>
+</div></div>
+
+<div class="info"><span>💡</span><span>firebaseConfig bukan rahasia — boleh ada di kode HTML. Yang rahasia adalah API keys yang kita simpan di HF Secrets. Firebase dilindungi oleh Authorized Domains (hanya domain terdaftar yang bisa pakai).</span></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(10)">← Kembali</button><div class="nprog">12 dari 15</div><button class="nbtn nnext" onclick="g(12)">Selanjutnya →</button></div>
+</div></div>
+
+<!-- 12 — SAMBUNGKAN SEMUA -->
+<div class="sec" id="s12">
+<div class="sh"><div class="sh-pill">LANGKAH 13</div><div class="sh-title">Sambungkan Whisper API ke NurAI</div><div class="sh-sub">Edit 1 baris — ganti URL dengan Space kamu</div></div>
+<div class="body">
+
+<div class="step"><div class="snum">1</div><div class="sbody">
+<div class="stitle">Edit whisper-client-hf.js</div>
+<div class="ss"><div class="ss-ic">📝</div><div class="ss-txt">Buka <code>whisper-client-hf.js</code> di Notepad</div></div>
+<div class="ss"><div class="ss-ic">🔍</div><div class="ss-txt">Cari baris pertama yang ada <code>YOUR_USERNAME</code></div></div>
+<div class="code"><div class="ch"><span class="cl">Ganti YOUR_USERNAME dengan username HF kamu</span></div><pre><span class="c">// SEBELUM:</span>
+<span class="k">const</span> HF_API = <span class="s">"https://YOUR_USERNAME-nurai-whisper.hf.space"</span>;
+
+<span class="c">// SESUDAH (contoh username = ahmad123):</span>
+<span class="k">const</span> HF_API = <span class="s">"https://ahmad123-nurai-whisper.hf.space"</span>;</pre></div>
+<div class="ss"><div class="ss-ic">💾</div><div class="ss-txt">Simpan file</div></div>
+</div></div>
+
+<div class="step"><div class="snum">2</div><div class="sbody">
+<div class="stitle">Tambahkan script ke NurAI-App.html</div>
+<div class="ss"><div class="ss-ic">🔍</div><div class="ss-txt">Buka <code>NurAI-App.html</code> → Ctrl+F → cari <code>&lt;/body&gt;</code></div></div>
+<div class="code"><div class="ch"><span class="cl">Tambahkan TEPAT sebelum &lt;/body&gt;</span><button class="cc" onclick="copyCode(this)">copy</button></div><pre><span class="k">&lt;script</span> <span class="v">src</span>=<span class="s">"whisper-client-hf.js"</span><span class="k">&gt;&lt;/script&gt;</span></pre></div>
+<div class="ss"><div class="ss-ic">🔍</div><div class="ss-txt">Cari juga <code>onclick="toggleRec()"</code> → ganti dengan <code>onclick="toggleRecReal()"</code></div></div>
+<div class="ss"><div class="ss-ic">💾</div><div class="ss-txt">Simpan NurAI-App.html</div></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(11)">← Kembali</button><div class="nprog">13 dari 15</div><button class="nbtn nnext" onclick="g(13)">Selanjutnya: Deploy →</button></div>
+</div></div>
+
+<!-- 13 — NETLIFY -->
+<div class="sec" id="s13">
+<div class="sh"><div class="sh-pill">LANGKAH 14</div><div class="sh-title">Deploy NurAI ke Netlify</div><div class="sh-sub">Drag & drop — 30 detik dapat URL publik dengan HTTPS</div></div>
+<div class="body">
+
+<div class="warn"><span>⚠️</span><span>Mikrofon hanya bisa diakses dari <strong>https://</strong> — tidak bisa dari file lokal. Wajib deploy ke Netlify dulu sebelum test rekam suara.</span></div>
+
+<div class="step"><div class="snum">1</div><div class="sbody">
+<div class="stitle">Upload ke Netlify Drop (tanpa daftar)</div>
+<div class="ss"><div class="ss-ic">🌐</div><div class="ss-txt">Buka <strong>netlify.com/drop</strong> di browser</div></div>
+<div class="ss"><div class="ss-ic">📁</div><div class="ss-txt">Pilih <strong>2 file sekaligus</strong>:<br>• <code>NurAI-App.html</code><br>• <code>whisper-client-hf.js</code></div></div>
+<div class="ss"><div class="ss-ic">🖱️</div><div class="ss-txt"><strong>Drag & drop kedua file</strong> ke area drop di netlify.com/drop — tunggu 10–30 detik</div></div>
+<div class="ss"><div class="ss-ic">🎉</div><div class="ss-txt">Dapat URL: <code>https://random-name.netlify.app</code> — ini URL permanen NurAI kamu!</div></div>
+</div></div>
+
+<div class="step"><div class="snum">2</div><div class="sbody">
+<div class="stitle">Tambahkan URL Netlify ke Firebase Auth</div>
+<div class="ss"><div class="ss-ic">🔥</div><div class="ss-txt">Firebase Console → Authentication → Settings → Authorized domains → Add domain → masukkan <code>random-name.netlify.app</code></div></div>
+<div class="info"><span>✅</span><span>Setelah ini Google Login akan berfungsi dari URL Netlify kamu.</span></div>
+</div></div>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(12)">← Kembali</button><div class="nprog">14 dari 15</div><button class="nbtn nnext" onclick="g(14)">Ceklis Final →</button></div>
+</div></div>
+
+<!-- 14 — FINAL CHECKLIST -->
+<div class="sec" id="s14">
+<div class="sh"><div class="sh-pill">🚀 LANGKAH TERAKHIR</div><div class="sh-title">Ceklis Final — Semua Sistem Go!</div><div class="sh-sub">Centang satu per satu sampai semua ✅ — NurAI siap terbang ke bulan 🌙</div></div>
+<div class="body">
+
+<div class="sdlbl">Backend Whisper</div>
+<div class="cklist">
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">HF Space status Running (hijau)</div><div class="ck-d">Cek di huggingface.co/spaces/USERNAME/nurai-whisper</div></div></div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">/health → openai_configured: true</div><div class="ck-d">Buka https://USERNAME-nurai-whisper.hf.space/health</div></div></div>
+</div>
+
+<div class="sdlbl">Firebase</div>
+<div class="cklist">
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">Google Login berfungsi</div><div class="ck-d">Buka NurAI di Netlify → tap Masuk dengan Google → popup Google muncul → berhasil login</div></div></div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">Data user tersimpan di Firestore</div><div class="ck-d">Firebase Console → Firestore → collection "users" → ada dokumen UID kamu</div></div></div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">Skor tersimpan setelah rekam</div><div class="ck-d">Rekam ayat → Firebase Console → Firestore → "scores" → ada skor kamu</div></div></div>
+</div>
+
+<div class="sdlbl">NurAI App End-to-End</div>
+<div class="cklist">
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">Console F12 menunjukkan Whisper online</div><div class="ck-d">Buka NurAI → F12 → Console: "✅ NurAI Whisper API online: https://..."</div></div></div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">Rekam ayat → skor NYATA muncul + transkripsi Arab</div><div class="ck-d">Modal skor harus menampilkan teks Arab yang terdeteksi, bukan hanya angka</div></div></div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">TTS berbahasa Indonesia berbunyi</div><div class="ck-d">Setelah rekam, speaker harus berbunyi dalam bahasa Indonesia memberikan koreksi tajwid</div></div></div>
+  <div class="ck" onclick="this.classList.toggle('checked');updateCkBox(this)"><div class="ck-box"></div><div><div class="ck-t">Install sebagai app di HP</div><div class="ck-d">Buka URL Netlify di HP → Add to Home Screen → ikon NurAI muncul di homescreen</div></div></div>
+</div>
+
+<div class="info"><span>🌙</span><span>Semua centang? <strong>Selamat! NurAI sudah terbang ke bulan.</strong> Kamu baru saja membangun platform Quran AI dengan backend Whisper, Google Login, database cloud, dan PWA — semua gratis!</span></div>
+
+<div class="sdlbl">Ringkasan biaya</div>
+<table class="stbl">
+  <tr><th>Layanan</th><th>Biaya</th><th>Batas gratis</th></tr>
+  <tr><td>HF Spaces (backend)</td><td><span class="tag tg">Gratis</span></td><td>Selamanya</td></tr>
+  <tr><td>GitHub (kode)</td><td><span class="tag tg">Gratis</span></td><td>Selamanya</td></tr>
+  <tr><td>Netlify (frontend)</td><td><span class="tag tg">Gratis</span></td><td>100GB/bulan</td></tr>
+  <tr><td>Firebase Auth</td><td><span class="tag tg">Gratis</span></td><td>10.000 login/bulan</td></tr>
+  <tr><td>Firestore</td><td><span class="tag tg">Gratis</span></td><td>50.000 baca/hari</td></tr>
+  <tr><td>OpenAI Whisper</td><td><span class="tag ta">$0.006/mnt</span></td><td>$5 kredit awal gratis</td></tr>
+</table>
+
+<div class="navrow"><button class="nbtn nprev" onclick="g(13)">← Kembali</button><div class="nprog">✅ Selesai!</div><button class="nbtn nnext" onclick="g(0)">🔄 Dari Awal</button></div>
+</div></div>
+
+</div></div>
+
+<script>
+let cur=0;
+function g(n){
+  document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i===n));
+  document.querySelectorAll('.si').forEach((s,i)=>{
+    s.classList.toggle('on',i===n);
+    if(i<n){s.classList.add('done');s.querySelector('.sn').textContent='';}
+    else if(i>n){s.classList.remove('done');const sn=s.querySelector('.sn');if(!sn.classList.contains('done'))sn.textContent=i+1;}
+  });
+  cur=n;
+  document.getElementById('mc').scrollTop=0;
+}
+function updateCkBox(el){
+  el.querySelector('.ck-box').textContent=el.classList.contains('checked')?'✓':'';
+}
+function copyCode(btn){
+  const pre=btn.closest('.code').querySelector('pre');
+  navigator.clipboard?.writeText(pre.innerText).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='copy',1500);});
+}
+</script>
