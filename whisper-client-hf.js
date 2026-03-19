@@ -11,7 +11,7 @@
 
 // ── GANTI dengan URL Space kamu ───────────────────────
 // Format: https://USERNAME-SPACENAME.hf.space
-const HF_API = "https://YOUR_USERNAME-nurai-whisper.hf.space";
+const HF_API = "https://fastnetkesilir-nurai-whisper.hf.space";
 // Contoh: "https://ahmad-nurai-whisper.hf.space"
 
 // ── State ─────────────────────────────────────────────
@@ -27,7 +27,7 @@ async function whisperOnline() {
   try {
     const r = await fetch(`${HF_API}/health`, { signal: AbortSignal.timeout(8000) });
     const d = await r.json();
-    return d.status === "ok" && d.openai_configured;
+    return d.status === "ok" && (d.groq_configured || d.openai_configured);
   } catch { return false; }
 }
 
