@@ -1061,14 +1061,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
             </button>
           </div>
           <div class="srch-chips">
-            <div class="srch-chip" onclick="quickSearch('kesabaran dan cobaan')">Kesabaran</div>
-            <div class="srch-chip" onclick="quickSearch('rezeki dan keberkahan')">Rezeki</div>
-            <div class="srch-chip" onclick="quickSearch('berbakti kepada orang tua')">Orang Tua</div>
-            <div class="srch-chip" onclick="quickSearch('surga dan neraka')">Surga</div>
-            <div class="srch-chip" onclick="quickSearch('bertawakal kepada Allah')">Tawakal</div>
-            <div class="srch-chip" onclick="quickSearch('bersyukur nikmat')">Syukur</div>
-            <div class="srch-chip" onclick="quickSearch('sifat orang beriman')">Orang Beriman</div>
-            <div class="srch-chip" onclick="quickSearch('doa dan harapan')">Doa</div>
+            <div class="srch-chip" onclick="quickSearch('haji umrah')">Haji</div>
+            <div class="srch-chip" onclick="quickSearch('nikah pernikahan')">Nikah</div>
+            <div class="srch-chip" onclick="quickSearch('sabar cobaan')">Sabar</div>
+            <div class="srch-chip" onclick="quickSearch('rezeki tawakal')">Rezeki</div>
+            <div class="srch-chip" onclick="quickSearch('orang tua ibu bapak')">Orang Tua</div>
+            <div class="srch-chip" onclick="quickSearch('taubat istighfar')">Taubat</div>
+            <div class="srch-chip" onclick="quickSearch('doa dikabulkan')">Doa</div>
+            <div class="srch-chip" onclick="quickSearch('surga akhirat')">Surga</div>
+            <div class="srch-chip" onclick="quickSearch('ilmu belajar')">Ilmu</div>
+            <div class="srch-chip" onclick="quickSearch('shalat ibadah')">Shalat</div>
+            <div class="srch-chip" onclick="quickSearch('syukur nikmat')">Syukur</div>
+            <div class="srch-chip" onclick="quickSearch('akhlak moral')">Akhlak</div>
           </div>
         </div>
         <div class="srch-body" id="srchBody">
@@ -1221,12 +1225,58 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 
 <!-- SHAZAM -->
 <div class="overlay" id="shzOv" onclick="closeShazam(event)">
-  <div class="ov-card" onclick="event.stopPropagation()" style="width:300px">
-    <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px">🔎 Shazam Al-Qur'an</div>
-    <div style="font-size:11px;color:var(--ink4);margin-bottom:14px;line-height:1.6">Rekam bacaan Arab — sistem cari ayat yang cocok</div>
-    <div class="shz-circle" id="shzC" onclick="toggleShazam()"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div>
-    <div class="shz-res" id="shzRes"><div class="shz-ar" id="shzAr"></div><div style="font-size:11px;color:var(--ink3)" id="shzInfo"></div></div>
-    <button style="width:100%;padding:9px;border:1px solid var(--paper3);border-radius:var(--r);background:var(--paper2);color:var(--ink3);font-family:var(--ff);font-size:11px;cursor:pointer" onclick="closeShazam(null)">Tutup</button>
+  <div class="ov-card" onclick="event.stopPropagation()" style="width:320px">
+    <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px">Shazam Al-Qur'an</div>
+    <div style="font-size:11px;color:var(--ink4);margin-bottom:14px;line-height:1.6">Baca ayat apa saja — sistem kenali & tampilkan ayat lengkap</div>
+
+    <!-- Status bar -->
+    <div id="shzStatus" style="font-size:10px;text-align:center;margin-bottom:10px;color:var(--ink4);min-height:14px;transition:.3s">Tap tombol lalu baca ayat</div>
+
+    <!-- Mic button -->
+    <div class="shz-circle" id="shzC" onclick="toggleShazam()">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </div>
+
+    <!-- Live timer -->
+    <div id="shzTimer" style="text-align:center;font-size:11px;color:var(--jade2);font-weight:600;margin:8px 0;min-height:16px;display:none">
+      <span id="shzTimerVal">00:00</span> — Sedang merekam...
+    </div>
+
+    <!-- API URL config (user isi sekali) -->
+    <div id="shzApiWrap" style="margin-bottom:10px">
+      <div style="font-size:9px;color:var(--ink4);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Whisper API URL (isi sekali)</div>
+      <div style="display:flex;gap:6px">
+        <input id="shzApiUrl" type="text" placeholder="https://USER-nurai-whisper-api.hf.space"
+          style="flex:1;padding:6px 9px;background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--r);font-size:10px;font-family:var(--ff);color:var(--ink);outline:none"
+          oninput="localStorage.setItem('nurai_whisper_url', this.value.trim())">
+        <button onclick="testWhisperApi()" style="padding:6px 10px;background:var(--jade4);border:1px solid var(--jade5);border-radius:var(--r);font-size:10px;font-family:var(--ff);color:var(--jade2);cursor:pointer;white-space:nowrap">Test</button>
+      </div>
+      <div id="shzApiStatus" style="font-size:9px;margin-top:4px;color:var(--ink4)"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="shz-res" id="shzRes" style="display:none">
+      <!-- Confidence bar -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:9px;color:var(--ink4);white-space:nowrap">Kemiripan</div>
+        <div style="flex:1;height:4px;background:var(--paper3);border-radius:2px"><div id="shzConfBar" style="height:100%;background:var(--jade3);border-radius:2px;width:0%;transition:.5s"></div></div>
+        <div id="shzConfPct" style="font-size:9px;font-weight:700;color:var(--jade2);min-width:28px">0%</div>
+      </div>
+      <!-- Arabic text -->
+      <div class="shz-ar" id="shzAr"></div>
+      <!-- What was heard -->
+      <div id="shzHeard" style="font-size:10px;color:var(--ink4);margin:6px 0 4px;font-style:italic;direction:rtl;text-align:right"></div>
+      <!-- Info + actions -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div id="shzInfo" style="font-size:11px;font-weight:600;color:var(--ink)"></div>
+        <button id="shzGoBtn" style="padding:5px 12px;background:var(--jade2);border:none;border-radius:20px;font-size:10px;font-weight:600;color:#fff;cursor:pointer;font-family:var(--ff)" onclick="shazamGoToAyah()">Buka Ayat</button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="shzErr" style="display:none;font-size:10px;color:var(--red);background:#fff0f0;border:1px solid #fcc;border-radius:var(--r);padding:8px 10px;margin:8px 0;line-height:1.6"></div>
+
+    <button style="width:100%;padding:9px;border:1px solid var(--paper3);border-radius:var(--r);background:var(--paper2);color:var(--ink3);font-family:var(--ff);font-size:11px;cursor:pointer;margin-top:6px" onclick="closeShazam(null)">Tutup</button>
   </div>
 </div>
 
@@ -2432,21 +2482,163 @@ function selectWbwWord(ayahNum, wordIdx, word) {
 // FITUR 2 — AI SEARCH AYAT
 // ═══════════════════════════════════════════════
 const SEARCH_DB = [
-  {surah:2,ayah:153,ref:'Al-Baqarah 2:153',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ',id:'Wahai orang-orang yang beriman! Mohonlah pertolongan kepada Allah dengan sabar dan shalat.',topics:['sabar','cobaan','ujian','pertolongan','shalat','ujian hidup'],score:0},
-  {surah:2,ayah:286,ref:'Al-Baqarah 2:286',ar:'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا',id:'Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.',topics:['cobaan','beban','ujian','kemampuan','batas','Allah adil'],score:0},
-  {surah:65,ayah:3,ref:'Ath-Thalaq 65:3',ar:'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ',id:'Dan barangsiapa bertawakal kepada Allah, niscaya Allah akan mencukupkan (keperluan)nya.',topics:['tawakal','rezeki','kepercayaan','bergantung kepada Allah','cukup'],score:0},
-  {surah:14,ayah:7,ref:'Ibrahim 14:7',ar:'لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ',id:'Jika kamu bersyukur, pasti Aku akan menambah (nikmat) kepadamu.',topics:['syukur','nikmat','bertambah','bersyukur','rezeki bertambah'],score:0},
-  {surah:17,ayah:23,ref:'Al-Isra 17:23',ar:'وَقَضَىٰ رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَانًا',id:'Tuhanmu telah memerintahkan agar kamu jangan menyembah selain Dia dan hendaklah berbuat baik kepada ibu bapak.',topics:['orang tua','berbakti','ibu','bapak','berbuat baik','birrul walidain'],score:0},
-  {surah:31,ayah:14,ref:'Luqman 31:14',ar:'وَوَصَّيْنَا الْإِنسَانَ بِوَالِدَيْهِ حَمَلَتْهُ أُمُّهُ وَهْنًا عَلَىٰ وَهْنٍ',id:'Dan Kami perintahkan kepada manusia (agar berbuat baik) kepada kedua orang tuanya. Ibunya telah mengandungnya dalam keadaan lemah yang bertambah-tambah.',topics:['orang tua','ibu','berbakti','kandungan','kasih sayang','berbuat baik'],score:0},
-  {surah:2,ayah:261,ref:'Al-Baqarah 2:261',ar:'مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ',id:'Perumpamaan orang yang menginfakkan hartanya di jalan Allah seperti sebutir biji yang menumbuhkan tujuh tangkai.',topics:['sedekah','infak','rezeki','keberkahan','harta','dermawan'],score:0},
+  // ── IMAN & TAUHID ────────────────────────────────────
+  {surah:2,ayah:255,ref:'Al-Baqarah 2:255',ar:'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',id:'Allah, tidak ada tuhan selain Dia. Yang Mahahidup, Yang terus-menerus mengurus makhluk-Nya.',topics:['tauhid','Allah','ayat kursi','keagungan','perlindungan','kekuatan','iman'],score:0},
+  {surah:112,ayah:1,ref:'Al-Ikhlas 112:1',ar:'قُلْ هُوَ اللَّهُ أَحَدٌ',id:'Katakanlah: Dialah Allah, Yang Maha Esa.',topics:['tauhid','esa','ikhlas','Allah','keesaan','murni'],score:0},
+  {surah:4,ayah:36,ref:'An-Nisa 4:36',ar:'وَاعْبُدُوا اللَّهَ وَلَا تُشْرِكُوا بِهِ شَيْئًا',id:'Sembahlah Allah dan janganlah kamu mempersekutukan-Nya dengan sesuatu apapun.',topics:['tauhid','ibadah','syirik','Allah saja','menyembah','larangan'],score:0},
+  {surah:6,ayah:103,ref:'Al-An\'am 6:103',ar:'لَّا تُدْرِكُهُ الْأَبْصَارُ وَهُوَ يُدْرِكُ الْأَبْصَارَ',id:'Dia tidak dapat dicapai oleh penglihatan mata, sedang Dia dapat melihat segala penglihatan.',topics:['Allah','keagungan','penglihatan','sifat Allah','maha melihat'],score:0},
+  {surah:59,ayah:22,ref:'Al-Hasyr 59:22',ar:'هُوَ اللَّهُ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ',id:'Dialah Allah, tidak ada tuhan selain Dia, Yang Mengetahui yang gaib dan yang nyata.',topics:['tauhid','Allah','gaib','mengetahui','sifat Allah','asmaul husna'],score:0},
+  {surah:57,ayah:3,ref:'Al-Hadid 57:3',ar:'هُوَ الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ',id:'Dialah Yang Awal, Yang Akhir, Yang Zahir, dan Yang Batin.',topics:['asmaul husna','sifat Allah','al-awwal','al-akhir','keagungan','tauhid'],score:0},
+
+  // ── SHALAT & IBADAH ──────────────────────────────────
+  {surah:2,ayah:153,ref:'Al-Baqarah 2:153',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ',id:'Wahai orang-orang yang beriman! Mohonlah pertolongan kepada Allah dengan sabar dan shalat.',topics:['sabar','shalat','pertolongan','cobaan','ujian','ibadah'],score:0},
+  {surah:29,ayah:45,ref:'Al-Ankabut 29:45',ar:'إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ',id:'Sesungguhnya shalat mencegah dari perbuatan keji dan mungkar.',topics:['shalat','ibadah','mencegah','kemungkaran','akhlak','keji'],score:0},
+  {surah:23,ayah:1,ref:'Al-Mukminun 23:1',ar:'قَدْ أَفْلَحَ الْمُؤْمِنُونَ',id:'Sungguh beruntung orang-orang yang beriman.',topics:['iman','beruntung','mukmin','sukses','kemenangan'],score:0},
+  {surah:23,ayah:2,ref:'Al-Mukminun 23:2',ar:'الَّذِينَ هُمْ فِي صَلَاتِهِمْ خَاشِعُونَ',id:'Yaitu orang-orang yang khusyuk dalam shalatnya.',topics:['shalat','khusyuk','ibadah','konsentrasi','mukmin'],score:0},
+  {surah:4,ayah:103,ref:'An-Nisa 4:103',ar:'إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا',id:'Sesungguhnya shalat itu adalah kewajiban yang ditentukan waktunya bagi orang-orang beriman.',topics:['shalat','wajib','waktu','kewajiban','fardhu','ibadah'],score:0},
+  {surah:20,ayah:14,ref:'Taha 20:14',ar:'وَأَقِمِ الصَّلَاةَ لِذِكْرِي',id:'Dan dirikanlah shalat untuk mengingat Aku.',topics:['shalat','dzikir','mengingat Allah','ibadah','perintah'],score:0},
+
+  // ── PUASA & RAMADHAN ─────────────────────────────────
+  {surah:2,ayah:183,ref:'Al-Baqarah 2:183',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ',id:'Wahai orang-orang yang beriman! Diwajibkan atas kamu berpuasa.',topics:['puasa','ramadhan','wajib','ibadah','kewajiban','shaum'],score:0},
+  {surah:2,ayah:185,ref:'Al-Baqarah 2:185',ar:'شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ',id:'Bulan Ramadan adalah bulan diturunkannya Al-Qur\'an.',topics:['ramadhan','puasa','quran','turun','bulan','ibadah'],score:0},
+  {surah:2,ayah:186,ref:'Al-Baqarah 2:186',ar:'وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ',id:'Dan apabila hamba-hamba-Ku bertanya kepadamu tentang Aku, maka sesungguhnya Aku dekat.',topics:['doa','dekat','Allah','puasa','ramadhan','dikabulkan','berdoa'],score:0},
+
+  // ── ZAKAT & SEDEKAH ──────────────────────────────────
+  {surah:2,ayah:261,ref:'Al-Baqarah 2:261',ar:'مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ',id:'Perumpamaan orang yang menginfakkan hartanya di jalan Allah seperti sebutir biji yang menumbuhkan tujuh tangkai.',topics:['sedekah','infak','rezeki','keberkahan','harta','dermawan','zakat'],score:0},
+  {surah:2,ayah:177,ref:'Al-Baqarah 2:177',ar:'وَآتَى الْمَالَ عَلَىٰ حُبِّهِ ذَوِي الْقُرْبَىٰ وَالْيَتَامَىٰ وَالْمَسَاكِينَ',id:'Memberikan harta yang dicintainya kepada kerabat, anak yatim, dan orang-orang miskin.',topics:['sedekah','zakat','yatim','miskin','infak','kebaikan','derma'],score:0},
+  {surah:9,ayah:60,ref:'At-Taubah 9:60',ar:'إِنَّمَا الصَّدَقَاتُ لِلْفُقَرَاءِ وَالْمَسَاكِينِ',id:'Sesungguhnya zakat itu hanyalah untuk orang-orang fakir dan orang-orang miskin.',topics:['zakat','sedekah','fakir','miskin','mustahik','wajib'],score:0},
+  {surah:14,ayah:7,ref:'Ibrahim 14:7',ar:'لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ',id:'Jika kamu bersyukur, pasti Aku akan menambah nikmat kepadamu.',topics:['syukur','nikmat','bertambah','bersyukur','rezeki','sedekah'],score:0},
+
+  // ── HAJI & UMRAH ─────────────────────────────────────
+  {surah:3,ayah:97,ref:'Ali Imran 3:97',ar:'وَلِلَّهِ عَلَى النَّاسِ حِجُّ الْبَيْتِ مَنِ اسْتَطَاعَ إِلَيْهِ سَبِيلًا',id:'Dan di antara kewajiban manusia terhadap Allah adalah melaksanakan ibadah haji ke Baitullah, bagi yang mampu mengadakan perjalanan ke sana.',topics:['haji','ibadah','baitullah','kewajiban','mampu','makkah','rukun islam'],score:0},
+  {surah:2,ayah:196,ref:'Al-Baqarah 2:196',ar:'وَأَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلَّهِ',id:'Dan sempurnakanlah ibadah haji dan umrah karena Allah.',topics:['haji','umrah','ibadah','sempurnakan','makkah','ihram'],score:0},
+  {surah:22,ayah:27,ref:'Al-Hajj 22:27',ar:'وَأَذِّن فِي النَّاسِ بِالْحَجِّ يَأْتُوكَ رِجَالًا',id:'Dan serulah manusia untuk mengerjakan haji, niscaya mereka akan datang kepadamu dengan berjalan kaki.',topics:['haji','seruan','panggilan','ibadah','makkah','ibrahim'],score:0},
+  {surah:22,ayah:28,ref:'Al-Hajj 22:28',ar:'لِّيَشْهَدُوا مَنَافِعَ لَهُمْ وَيَذْكُرُوا اسْمَ اللَّهِ فِي أَيَّامٍ مَّعْلُومَاتٍ',id:'Agar mereka menyaksikan berbagai manfaat untuk mereka dan mengingat nama Allah pada hari-hari yang telah ditentukan.',topics:['haji','manfaat','dzikir','hari raya','kurban','ibadah'],score:0},
+  {surah:2,ayah:197,ref:'Al-Baqarah 2:197',ar:'الْحَجُّ أَشْهُرٌ مَّعْلُومَاتٌ فَمَن فَرَضَ فِيهِنَّ الْحَجَّ فَلَا رَفَثَ وَلَا فُسُوقَ',id:'Musim haji adalah beberapa bulan yang telah diketahui. Barang siapa mengerjakan haji dalam bulan-bulan itu, janganlah berbuat rafas dan janganlah berbuat fasik.',topics:['haji','larangan','ihram','rafas','fasik','musim haji'],score:0},
+  {surah:22,ayah:37,ref:'Al-Hajj 22:37',ar:'لَن يَنَالَ اللَّهَ لُحُومُهَا وَلَا دِمَاؤُهَا وَلَٰكِن يَنَالُهُ التَّقْوَىٰ مِنكُمْ',id:'Daging-daging dan darahnya itu sekali-kali tidak dapat mencapai Allah, tetapi ketakwaan dari kamulah yang dapat mencapainya.',topics:['kurban','haji','taqwa','ikhlas','ibadah','qurban'],score:0},
+
+  // ── REZEKI & HARTA ───────────────────────────────────
+  {surah:65,ayah:3,ref:'Ath-Thalaq 65:3',ar:'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ',id:'Barangsiapa bertawakal kepada Allah, niscaya Allah akan mencukupkan keperluannya.',topics:['tawakal','rezeki','cukup','bergantung','Allah','percaya'],score:0},
+  {surah:65,ayah:2,ref:'Ath-Thalaq 65:2-3',ar:'وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ',id:'Barangsiapa bertakwa kepada Allah niscaya Dia akan membukakan jalan keluar dan memberinya rezeki dari arah yang tidak disangka-sangka.',topics:['taqwa','rezeki','jalan keluar','tak terduga','berkah','solusi'],score:0},
+  {surah:11,ayah:6,ref:'Hud 11:6',ar:'وَمَا مِن دَابَّةٍ فِي الْأَرْضِ إِلَّا عَلَى اللَّهِ رِزْقُهَا',id:'Dan tidak ada satupun makhluk bergerak di bumi melainkan semuanya dijamin rezekinya oleh Allah.',topics:['rezeki','jaminan','Allah','makhluk','bumi','kepercayaan'],score:0},
+  {surah:51,ayah:58,ref:'Az-Zariyat 51:58',ar:'إِنَّ اللَّهَ هُوَ الرَّزَّاقُ ذُو الْقُوَّةِ الْمَتِينُ',id:'Sesungguhnya Allah, Dialah Pemberi Rezeki, Yang Mempunyai Kekuatan lagi Sangat Kokoh.',topics:['rezeki','ar-razzaq','kekuatan','Allah','asmaul husna'],score:0},
+
+  // ── SABAR & UJIAN ────────────────────────────────────
+  {surah:94,ayah:5,ref:'Al-Insyirah 94:5',ar:'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا',id:'Karena sesungguhnya sesudah kesulitan itu ada kemudahan.',topics:['kemudahan','kesulitan','harapan','sabar','semangat','cobaan'],score:0},
+  {surah:2,ayah:286,ref:'Al-Baqarah 2:286',ar:'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا',id:'Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.',topics:['cobaan','beban','ujian','kemampuan','batas','Allah adil','sabar'],score:0},
+  {surah:3,ayah:200,ref:'Ali Imran 3:200',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا اصْبِرُوا وَصَابِرُوا وَرَابِطُوا',id:'Wahai orang-orang yang beriman! Bersabarlah kamu dan kuatkanlah kesabaranmu.',topics:['sabar','kuat','iman','berjuang','ujian','ketahanan'],score:0},
+  {surah:2,ayah:156,ref:'Al-Baqarah 2:156',ar:'إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ',id:'Sesungguhnya kami milik Allah dan kepada-Nyalah kami kembali.',topics:['innalillahi','musibah','sabar','kematian','duka','kembali kepada Allah'],score:0},
+  {surah:39,ayah:10,ref:'Az-Zumar 39:10',ar:'إِنَّمَا يُوَفَّى الصَّابِرُونَ أَجْرَهُم بِغَيْرِ حِسَابٍ',id:'Sesungguhnya hanya orang-orang yang bersabarlah yang dicukupkan pahala mereka tanpa batas.',topics:['sabar','pahala','tanpa batas','balasan','ujian','surga'],score:0},
+
+  // ── TAUBAT & AMPUNAN ─────────────────────────────────
+  {surah:39,ayah:53,ref:'Az-Zumar 39:53',ar:'قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ',id:'Janganlah kamu berputus asa dari rahmat Allah. Sesungguhnya Allah mengampuni dosa-dosa semuanya.',topics:['taubat','ampunan','dosa','rahmat','harapan','putus asa','istighfar'],score:0},
+  {surah:4,ayah:110,ref:'An-Nisa 4:110',ar:'وَمَن يَعْمَلْ سُوءًا أَوْ يَظْلِمْ نَفْسَهُ ثُمَّ يَسْتَغْفِرِ اللَّهَ يَجِدِ اللَّهَ غَفُورًا رَّحِيمًا',id:'Barangsiapa mengerjakan keburukan atau menzalimi dirinya kemudian memohon ampunan kepada Allah, niscaya dia akan mendapati Allah Maha Pengampun, Maha Penyayang.',topics:['taubat','istighfar','ampunan','dosa','rahmat','kembali','Allah'],score:0},
+  {surah:71,ayah:10,ref:'Nuh 71:10',ar:'فَقُلْتُ اسْتَغْفِرُوا رَبَّكُمْ إِنَّهُ كَانَ غَفَّارًا',id:'Maka aku berkata, mohonlah ampunan kepada Tuhanmu, sesungguhnya Dia adalah Maha Pengampun.',topics:['istighfar','taubat','ampunan','doa','rahmat'],score:0},
+  {surah:71,ayah:11,ref:'Nuh 71:11-12',ar:'يُرْسِلِ السَّمَاءَ عَلَيْكُم مِّدْرَارًا وَيُمْدِدْكُم بِأَمْوَالٍ وَبَنِينَ',id:'Niscaya Dia akan mengirimkan hujan kepadamu dengan lebat dan memperbanyak harta serta anak-anakmu.',topics:['istighfar','rezeki','hujan','anak','harta','berkah','taubat'],score:0},
+
+  // ── ORANG TUA & KELUARGA ─────────────────────────────
+  {surah:17,ayah:23,ref:'Al-Isra 17:23',ar:'وَقَضَىٰ رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَانًا',id:'Tuhanmu memerintahkan agar jangan menyembah selain Dia dan hendaklah berbuat baik kepada ibu bapak.',topics:['orang tua','berbakti','ibu','bapak','berbuat baik','birrul walidain'],score:0},
+  {surah:17,ayah:24,ref:'Al-Isra 17:24',ar:'وَاخْفِضْ لَهُمَا جَنَاحَ الذُّلِّ مِنَ الرَّحْمَةِ وَقُل رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',id:'Rendahkanlah dirimu terhadap keduanya dengan penuh kasih sayang dan ucapkanlah: Tuhanku, sayangilah keduanya sebagaimana mereka telah mendidikku waktu kecil.',topics:['orang tua','ibu','bapak','doa','kasih sayang','mendidik','birrul walidain'],score:0},
+  {surah:31,ayah:14,ref:'Luqman 31:14',ar:'وَوَصَّيْنَا الْإِنسَانَ بِوَالِدَيْهِ حَمَلَتْهُ أُمُّهُ وَهْنًا عَلَىٰ وَهْنٍ',id:'Kami perintahkan manusia berbuat baik kepada kedua orang tuanya. Ibunya telah mengandungnya dalam keadaan lemah.',topics:['orang tua','ibu','berbakti','kandungan','kasih sayang'],score:0},
+  {surah:4,ayah:1,ref:'An-Nisa 4:1',ar:'يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمُ الَّذِي خَلَقَكُم مِّن نَّفْسٍ وَاحِدَةٍ',id:'Wahai manusia! Bertakwalah kepada Tuhanmu yang telah menciptakan kamu dari satu jiwa.',topics:['keluarga','silaturahmi','manusia','penciptaan','satu jiwa','pertalian'],score:0},
+
+  // ── NIKAH & RUMAH TANGGA ─────────────────────────────
+  {surah:30,ayah:21,ref:'Ar-Rum 30:21',ar:'وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا',id:'Di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan hidup untukmu agar kamu merasa tenteram.',topics:['nikah','pernikahan','pasangan','cinta','sakinah','ketenangan','rumah tangga'],score:0},
+  {surah:2,ayah:187,ref:'Al-Baqarah 2:187',ar:'هُنَّ لِبَاسٌ لَّكُمْ وَأَنتُمْ لِبَاسٌ لَّهُنَّ',id:'Mereka adalah pakaian bagimu, dan kamu adalah pakaian bagi mereka.',topics:['nikah','suami istri','pasangan','pernikahan','rumah tangga','kebersamaan'],score:0},
+  {surah:4,ayah:19,ref:'An-Nisa 4:19',ar:'وَعَاشِرُوهُنَّ بِالْمَعْرُوفِ',id:'Dan bergaullah dengan mereka secara patut.',topics:['nikah','suami istri','bergaul','baik','rumah tangga','hak istri'],score:0},
+  {surah:2,ayah:228,ref:'Al-Baqarah 2:228',ar:'وَلَهُنَّ مِثْلُ الَّذِي عَلَيْهِنَّ بِالْمَعْرُوفِ',id:'Dan para wanita mempunyai hak yang seimbang dengan kewajibannya menurut cara yang patut.',topics:['nikah','hak wanita','kesetaraan','istri','pernikahan','kewajiban'],score:0},
+
+  // ── ANAK & PENDIDIKAN ────────────────────────────────
+  {surah:31,ayah:17,ref:'Luqman 31:17',ar:'يَا بُنَيَّ أَقِمِ الصَّلَاةَ وَأْمُرْ بِالْمَعْرُوفِ وَانْهَ عَنِ الْمُنكَرِ',id:'Wahai anakku! Laksanakanlah shalat dan suruhlah manusia berbuat yang makruf dan cegahlah mereka dari yang mungkar.',topics:['anak','mendidik','shalat','amar makruf','nahi mungkar','nasihat'],score:0},
+  {surah:31,ayah:13,ref:'Luqman 31:13',ar:'يَا بُنَيَّ لَا تُشْرِكْ بِاللَّهِ إِنَّ الشِّرْكَ لَظُلْمٌ عَظِيمٌ',id:'Wahai anakku! Janganlah kamu mempersekutukan Allah, sesungguhnya mempersekutukan Allah adalah kezaliman yang besar.',topics:['anak','mendidik','tauhid','syirik','kezaliman','nasihat luqman'],score:0},
+  {surah:66,ayah:6,ref:'At-Tahrim 66:6',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا قُوا أَنفُسَكُمْ وَأَهْلِيكُمْ نَارًا',id:'Wahai orang-orang yang beriman! Peliharalah dirimu dan keluargamu dari api neraka.',topics:['anak','keluarga','mendidik','neraka','perlindungan','tanggung jawab'],score:0},
+  {surah:96,ayah:1,ref:'Al-Alaq 96:1',ar:'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ',id:'Bacalah dengan menyebut nama Tuhanmu yang menciptakan.',topics:['ilmu','membaca','belajar','pendidikan','wahyu pertama','pengetahuan'],score:0},
+  {surah:96,ayah:4,ref:'Al-Alaq 96:4-5',ar:'الَّذِي عَلَّمَ بِالْقَلَمِ عَلَّمَ الْإِنسَانَ مَا لَمْ يَعْلَمْ',id:'Yang mengajar manusia dengan pena. Dia mengajarkan manusia apa yang tidak diketahuinya.',topics:['ilmu','pena','belajar','mengajar','pengetahuan','pendidikan'],score:0},
+
+  // ── AKHLAK & MORAL ───────────────────────────────────
+  {surah:3,ayah:133,ref:'Ali Imran 3:133',ar:'وَسَارِعُوا إِلَىٰ مَغْفِرَةٍ مِّن رَّبِّكُمْ وَجَنَّةٍ عَرْضُهَا السَّمَاوَاتُ وَالْأَرْضُ',id:'Bersegeralah kamu menuju ampunan dari Tuhanmu dan surga yang luasnya seluas langit dan bumi.',topics:['surga','ampunan','bersegera','kebaikan','motivasi','akhirat'],score:0},
+  {surah:3,ayah:134,ref:'Ali Imran 3:134',ar:'الَّذِينَ يُنفِقُونَ فِي السَّرَّاءِ وَالضَّرَّاءِ وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ',id:'Orang yang berinfak di waktu lapang dan sempit, dan orang-orang yang menahan amarah dan memaafkan.',topics:['akhlak','maaf','amarah','sabar','infak','memaafkan','dermawan'],score:0},
+  {surah:49,ayah:11,ref:'Al-Hujurat 49:11',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا لَا يَسْخَرْ قَوْمٌ مِّن قَوْمٍ',id:'Wahai orang-orang yang beriman! Janganlah suatu kaum mengolok-olok kaum yang lain.',topics:['akhlak','mengolok','menghina','larangan','persaudaraan','adab'],score:0},
+  {surah:49,ayah:12,ref:'Al-Hujurat 49:12',ar:'وَلَا تَجَسَّسُوا وَلَا يَغْتَب بَّعْضُكُم بَعْضًا',id:'Janganlah kamu mencari-cari kesalahan orang lain dan janganlah ada di antara kamu yang menggunjing.',topics:['ghibah','menggunjing','tajassus','akhlak','larangan','aib','fitnah'],score:0},
+  {surah:49,ayah:13,ref:'Al-Hujurat 49:13',ar:'يَا أَيُّهَا النَّاسُ إِنَّا خَلَقْنَاكُم مِّن ذَكَرٍ وَأُنثَىٰ وَجَعَلْنَاكُمْ شُعُوبًا',id:'Wahai manusia! Kami telah menciptakan kamu dari seorang laki-laki dan perempuan, kemudian Kami jadikan kamu berbangsa-bangsa.',topics:['persaudaraan','keberagaman','bangsa','suku','mengenal','taqwa'],score:0},
+  {surah:17,ayah:37,ref:'Al-Isra 17:37',ar:'وَلَا تَمْشِ فِي الْأَرْضِ مَرَحًا إِنَّكَ لَن تَخْرِقَ الْأَرْضَ',id:'Janganlah kamu berjalan di bumi ini dengan sombong, karena sesungguhnya kamu tidak akan dapat menembus bumi.',topics:['sombong','takabur','akhlak','larangan','rendah hati','tawadhu'],score:0},
+  {surah:31,ayah:18,ref:'Luqman 31:18',ar:'وَلَا تُصَعِّرْ خَدَّكَ لِلنَّاسِ وَلَا تَمْشِ فِي الْأَرْضِ مَرَحًا',id:'Janganlah kamu memalingkan wajah dari manusia dan janganlah berjalan di bumi dengan sombong.',topics:['sombong','akhlak','rendah hati','adab','larangan','tawadhu'],score:0},
+
+  // ── KEJUJURAN & AMANAH ───────────────────────────────
+  {surah:9,ayah:119,ref:'At-Taubah 9:119',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ',id:'Wahai orang-orang yang beriman! Bertakwalah kepada Allah dan bersamalah orang-orang yang jujur.',topics:['jujur','kejujuran','shiddiq','taqwa','akhlak','benar'],score:0},
+  {surah:4,ayah:58,ref:'An-Nisa 4:58',ar:'إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا',id:'Sesungguhnya Allah menyuruh kamu menyampaikan amanat kepada yang berhak menerimanya.',topics:['amanah','jujur','tanggung jawab','kepercayaan','akhlak','adil'],score:0},
+
+  // ── ILMU & HIKMAH ────────────────────────────────────
+  {surah:20,ayah:114,ref:'Taha 20:114',ar:'وَقُل رَّبِّ زِدْنِي عِلْمًا',id:'Dan katakanlah: Ya Tuhanku, tambahkanlah ilmu kepadaku.',topics:['ilmu','doa','belajar','pengetahuan','minta tambah','hikmah'],score:0},
+  {surah:2,ayah:269,ref:'Al-Baqarah 2:269',ar:'يُؤْتِي الْحِكْمَةَ مَن يَشَاءُ وَمَن يُؤْتَ الْحِكْمَةَ فَقَدْ أُوتِيَ خَيْرًا كَثِيرًا',id:'Dia memberikan hikmah kepada siapa yang Dia kehendaki. Barangsiapa diberi hikmah, sesungguhnya dia telah diberi kebaikan yang banyak.',topics:['hikmah','ilmu','kebijaksanaan','karunia','kebaikan','banyak'],score:0},
+  {surah:58,ayah:11,ref:'Al-Mujadilah 58:11',ar:'يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ',id:'Allah akan mengangkat derajat orang-orang yang beriman di antara kamu dan orang-orang yang diberi ilmu.',topics:['ilmu','derajat','tinggi','iman','belajar','pengetahuan'],score:0},
+
+  // ── DOA ──────────────────────────────────────────────
+  {surah:2,ayah:186,ref:'Al-Baqarah 2:186',ar:'وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ أُجِيبُ دَعْوَةَ الدَّاعِ',id:'Apabila hamba-hamba-Ku bertanya kepadamu tentang Aku, sesungguhnya Aku dekat. Aku mengabulkan permohonan orang yang berdoa.',topics:['doa','dikabulkan','dekat','Allah','permohonan','berdoa'],score:0},
+  {surah:40,ayah:60,ref:'Ghafir 40:60',ar:'وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ',id:'Tuhanmu berfirman: Berdoalah kepada-Ku, niscaya Aku perkenankan bagimu.',topics:['doa','dikabulkan','berdoa','perintah','Allah','permohonan'],score:0},
+  {surah:3,ayah:8,ref:'Ali Imran 3:8',ar:'رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا',id:'Ya Tuhan kami, janganlah Engkau palingkan hati kami setelah Engkau beri petunjuk kepada kami.',topics:['doa','hati','hidayah','petunjuk','istiqomah','keteguhan'],score:0},
+  {surah:2,ayah:201,ref:'Al-Baqarah 2:201',ar:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً',id:'Ya Tuhan kami, berilah kami kebaikan di dunia dan kebaikan di akhirat.',topics:['doa','dunia','akhirat','kebaikan','rabbanaa atina'],score:0},
+
+  // ── MATI & AKHIRAT ───────────────────────────────────
   {surah:3,ayah:185,ref:'Ali Imran 3:185',ar:'كُلُّ نَفْسٍ ذَائِقَةُ الْمَوْتِ',id:'Setiap yang bernyawa akan merasakan mati.',topics:['mati','kematian','akhirat','alam baka','kehidupan','ajal'],score:0},
-  {surah:39,ayah:53,ref:'Az-Zumar 39:53',ar:'قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ',id:'Katakanlah: "Wahai hamba-hamba-Ku yang melampaui batas terhadap diri mereka sendiri! Janganlah kamu berputus asa dari rahmat Allah."',topics:['taubat','ampunan','dosa','rahmat','harapan','putus asa'],score:0},
-  {surah:94,ayah:5,ref:'Al-Insyirah 94:5',ar:'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا',id:'Karena sesungguhnya sesudah kesulitan itu ada kemudahan.',topics:['kemudahan','kesulitan','harapan','cobaan','sabar','semangat'],score:0},
-  {surah:3,ayah:139,ref:'Ali Imran 3:139',ar:'وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ الْأَعْلَوْنَ',id:'Dan janganlah kamu (merasa) lemah, dan jangan (pula) bersedih hati, padahal kamu paling tinggi (derajatnya).',topics:['semangat','kuat','sedih','lemah','motivasi','berjuang'],score:0},
-  {surah:2,ayah:255,ref:'Al-Baqarah 2:255',ar:'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',id:'Allah, tidak ada tuhan selain Dia. Yang Mahahidup, Yang terus-menerus mengurus (makhluk-Nya).',topics:['tauhid','Allah','keagungan','kekuatan','ayat kursi','perlindungan'],score:0},
-  {surah:4,ayah:36,ref:'An-Nisa 4:36',ar:'وَاعْبُدُوا اللَّهَ وَلَا تُشْرِكُوا بِهِ شَيْئًا',id:'Sembahlah Allah dan janganlah kamu mempersekutukan-Nya dengan sesuatu apapun.',topics:['tauhid','ibadah','syirik','Allah saja','menyembah'],score:0},
-  {surah:49,ayah:13,ref:'Al-Hujurat 49:13',ar:'يَا أَيُّهَا النَّاسُ إِنَّا خَلَقْنَاكُم مِّن ذَكَرٍ وَأُنثَىٰ وَجَعَلْنَاكُمْ شُعُوبًا وَقَبَائِلَ لِتَعَارَفُوا',id:'Wahai manusia! Sungguh, Kami telah menciptakan kamu dari seorang laki-laki dan seorang perempuan, kemudian Kami jadikan kamu berbangsa-bangsa dan bersuku-suku agar kamu saling mengenal.',topics:['persaudaraan','keberagaman','manusia','bangsa','suku','mengenal'],score:0},
-  {surah:55,ayah:13,ref:'Ar-Rahman 55:13',ar:'فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ',id:'Maka nikmat Tuhanmu yang manakah yang kamu dustakan?',topics:['nikmat','syukur','alam','karunia','bersyukur','mengingkari'],score:0},
+  {surah:67,ayah:2,ref:'Al-Mulk 67:2',ar:'الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا',id:'Yang menciptakan mati dan hidup, untuk menguji kamu, siapa di antara kamu yang lebih baik amalnya.',topics:['mati','hidup','ujian','amal','akhirat','persiapan'],score:0},
+  {surah:56,ayah:88,ref:'Al-Waqi\'ah 56:88-89',ar:'فَأَمَّا إِن كَانَ مِنَ الْمُقَرَّبِينَ فَرَوْحٌ وَرَيْحَانٌ وَجَنَّتُ نَعِيمٍ',id:'Jika dia termasuk orang yang didekatkan kepada Allah, maka dia akan mendapat ketenangan dan rezeki serta surga kenikmatan.',topics:['mati','surga','akhirat','muqarrabin','kenikmatan','kedamaian'],score:0},
+  {surah:89,ayah:27,ref:'Al-Fajr 89:27-28',ar:'يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَّرْضِيَّةً',id:'Wahai jiwa yang tenang! Kembalilah kepada Tuhanmu dengan hati yang ridha dan diridhai-Nya.',topics:['mati','jiwa','tenang','ridha','akhirat','kembali','nafsul muthmainnah'],score:0},
+
+  // ── SURGA & NERAKA ───────────────────────────────────
+  {surah:3,ayah:133,ref:'Ali Imran 3:133',ar:'وَسَارِعُوا إِلَىٰ مَغْفِرَةٍ مِّن رَّبِّكُمْ وَجَنَّةٍ عَرْضُهَا السَّمَاوَاتُ وَالْأَرْضُ',id:'Bersegeralah menuju ampunan dari Tuhanmu dan surga yang luasnya seluas langit dan bumi.',topics:['surga','ampunan','luas','akhirat','motivasi','kebaikan'],score:0},
+  {surah:55,ayah:46,ref:'Ar-Rahman 55:46',ar:'وَلِمَنْ خَافَ مَقَامَ رَبِّهِ جَنَّتَانِ',id:'Dan bagi siapa yang takut akan saat menghadap Tuhannya ada dua surga.',topics:['surga','takut','Allah','akhirat','balasan','dua surga'],score:0},
+  {surah:13,ayah:35,ref:'Ar-Ra\'d 13:35',ar:'مَّثَلُ الْجَنَّةِ الَّتِي وُعِدَ الْمُتَّقُونَ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ',id:'Perumpamaan surga yang dijanjikan kepada orang-orang yang bertakwa mengalir sungai-sungai di bawahnya.',topics:['surga','taqwa','sungai','janji','akhirat','keindahan'],score:0},
+
+  // ── AL-QURAN ──────────────────────────────────────────
+  {surah:2,ayah:185,ref:'Al-Baqarah 2:185',ar:'شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ هُدًى لِّلنَّاسِ',id:'Bulan Ramadan adalah bulan diturunkannya Al-Qur\'an sebagai petunjuk bagi manusia.',topics:['quran','ramadhan','petunjuk','turun','hidayah','manusia'],score:0},
+  {surah:17,ayah:9,ref:'Al-Isra 17:9',ar:'إِنَّ هَٰذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ',id:'Sesungguhnya Al-Qur\'an ini memberi petunjuk ke jalan yang paling lurus.',topics:['quran','petunjuk','lurus','hidayah','panduan','jalan'],score:0},
+  {surah:15,ayah:9,ref:'Al-Hijr 15:9',ar:'إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ',id:'Sesungguhnya Kamilah yang menurunkan Al-Qur\'an dan Kamilah yang benar-benar memeliharanya.',topics:['quran','terjaga','dijaga','Allah','otentik','murni'],score:0},
+  {surah:47,ayah:24,ref:'Muhammad 47:24',ar:'أَفَلَا يَتَدَبَّرُونَ الْقُرْآنَ أَمْ عَلَىٰ قُلُوبٍ أَقْفَالُهَا',id:'Tidakkah mereka merenungkan Al-Qur\'an, ataukah hati mereka sudah terkunci.',topics:['quran','tadabur','merenungkan','memahami','hati','terkunci'],score:0},
+
+  // ── JIHAD & PERJUANGAN ───────────────────────────────
+  {surah:29,ayah:69,ref:'Al-Ankabut 29:69',ar:'وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا',id:'Dan orang-orang yang berjihad untuk mencari keridhaan Kami, Kami akan tunjukkan kepada mereka jalan-jalan Kami.',topics:['jihad','perjuangan','hidayah','jalan','usaha','sungguh-sungguh'],score:0},
+  {surah:9,ayah:41,ref:'At-Taubah 9:41',ar:'انفِرُوا خِفَافًا وَثِقَالًا وَجَاهِدُوا بِأَمْوَالِكُمْ وَأَنفُسِكُمْ فِي سَبِيلِ اللَّهِ',id:'Berangkatlah kamu baik dalam keadaan merasa ringan maupun berat, dan berjihadlah dengan harta dan jiwamu di jalan Allah.',topics:['jihad','perjuangan','harta','jiwa','fi sabilillah','sungguh-sungguh'],score:0},
+  {surah:3,ayah:139,ref:'Ali Imran 3:139',ar:'وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ الْأَعْلَوْنَ',id:'Janganlah kamu merasa lemah dan jangan bersedih hati, padahal kamu paling tinggi derajatnya.',topics:['semangat','kuat','sedih','lemah','motivasi','berjuang','jihad'],score:0},
+
+  // ── ALAM & TANDA KEBESARAN ───────────────────────────
+  {surah:55,ayah:13,ref:'Ar-Rahman 55:13',ar:'فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ',id:'Maka nikmat Tuhanmu yang manakah yang kamu dustakan?',topics:['nikmat','syukur','alam','karunia','bersyukur','ar-rahman'],score:0},
+  {surah:2,ayah:164,ref:'Al-Baqarah 2:164',ar:'إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ',id:'Sesungguhnya dalam penciptaan langit dan bumi, silih bergantinya malam dan siang terdapat tanda-tanda bagi orang-orang yang berakal.',topics:['alam','penciptaan','langit','bumi','tanda','kebesaran','berpikir'],score:0},
+  {surah:3,ayah:190,ref:'Ali Imran 3:190',ar:'إِنَّ فِي خَلْقِ السَّمَاوَاتِ وَالْأَرْضِ وَاخْتِلَافِ اللَّيْلِ وَالنَّهَارِ لَآيَاتٍ لِّأُولِي الْأَلْبَابِ',id:'Sesungguhnya dalam penciptaan langit dan bumi, dan pergantian malam dan siang, terdapat tanda-tanda bagi orang-orang yang berakal.',topics:['alam','langit','bumi','malam','siang','tanda','ulul albab'],score:0},
+
+  // ── MOTIVASI & SEMANGAT ──────────────────────────────
+  {surah:94,ayah:5,ref:'Al-Insyirah 94:5-6',ar:'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا إِنَّ مَعَ الْعُسْرِ يُسْرًا',id:'Karena sesungguhnya sesudah kesulitan itu ada kemudahan. Sesungguhnya sesudah kesulitan itu ada kemudahan.',topics:['kemudahan','kesulitan','harapan','semangat','cobaan','dua kali'],score:0},
+  {surah:13,ayah:11,ref:'Ar-Ra\'d 13:11',ar:'إِنَّ اللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا مَا بِأَنفُسِهِمْ',id:'Sesungguhnya Allah tidak akan mengubah keadaan suatu kaum sebelum mereka mengubah keadaan diri mereka sendiri.',topics:['perubahan','usaha','ikhtiar','semangat','motivasi','diri sendiri'],score:0},
+  {surah:65,ayah:3,ref:'Ath-Thalaq 65:3',ar:'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ إِنَّ اللَّهَ بَالِغُ أَمْرِهِ',id:'Barangsiapa bertawakal kepada Allah niscaya Allah akan mencukupkan keperluannya.',topics:['tawakal','percaya','cukup','Allah','semangat','optimis'],score:0},
+  {surah:94,ayah:7,ref:'Al-Insyirah 94:7',ar:'فَإِذَا فَرَغْتَ فَانصَبْ',id:'Maka apabila kamu telah selesai dari suatu urusan, tetaplah bekerja keras untuk urusan yang lain.',topics:['kerja keras','semangat','produktif','tidak berhenti','usaha'],score:0},
+
+  // ── TAQWA ────────────────────────────────────────────
+  {surah:2,ayah:2,ref:'Al-Baqarah 2:2',ar:'ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ',id:'Kitab ini tidak ada keraguan di dalamnya; petunjuk bagi mereka yang bertakwa.',topics:['taqwa','quran','petunjuk','keraguan','iman','hidayah'],score:0},
+  {surah:49,ayah:13,ref:'Al-Hujurat 49:13',ar:'إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ',id:'Sesungguhnya yang paling mulia di antara kamu di sisi Allah ialah orang yang paling bertakwa.',topics:['taqwa','mulia','derajat','Allah','kemuliaan','paling baik'],score:0},
+  {surah:3,ayah:102,ref:'Ali Imran 3:102',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ حَقَّ تُقَاتِهِ',id:'Wahai orang-orang yang beriman! Bertakwalah kepada Allah sebenar-benarnya takwa.',topics:['taqwa','iman','sebenar-benarnya','sungguh','ketaqwaan'],score:0},
+
+  // ── PERSAUDARAAN & SOSIAL ────────────────────────────
+  {surah:49,ayah:10,ref:'Al-Hujurat 49:10',ar:'إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا بَيْنَ أَخَوَيْكُمْ',id:'Sesungguhnya orang-orang beriman itu bersaudara. Karena itu damaikanlah antara kedua saudaramu.',topics:['persaudaraan','ukhuwah','damai','rukun','saudara','iman'],score:0},
+  {surah:3,ayah:103,ref:'Ali Imran 3:103',ar:'وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا وَلَا تَفَرَّقُوا',id:'Dan berpeganglah kamu semuanya kepada tali Allah, dan janganlah kamu bercerai-berai.',topics:['persatuan','ukhuwah','tali Allah','tidak berpecah','bersatu','jamaah'],score:0},
+  {surah:5,ayah:2,ref:'Al-Maidah 5:2',ar:'وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ وَلَا تَعَاوَنُوا عَلَى الْإِثْمِ وَالْعُدْوَانِ',id:'Tolong-menolonglah dalam kebaikan dan takwa, dan janganlah tolong-menolong dalam dosa dan permusuhan.',topics:['tolong menolong','kerjasama','kebaikan','taqwa','larangan','dosa'],score:0},
+
+  // ── KEADILAN ─────────────────────────────────────────
+  {surah:4,ayah:135,ref:'An-Nisa 4:135',ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا كُونُوا قَوَّامِينَ بِالْقِسْطِ',id:'Wahai orang-orang yang beriman! Jadilah kamu penegak keadilan.',topics:['keadilan','adil','penegak','iman','hak','jujur'],score:0},
+  {surah:5,ayah:8,ref:'Al-Maidah 5:8',ar:'وَلَا يَجْرِمَنَّكُمْ شَنَآنُ قَوْمٍ عَلَىٰ أَلَّا تَعْدِلُوا اعْدِلُوا هُوَ أَقْرَبُ لِلتَّقْوَىٰ',id:'Janganlah kebencianmu mendorong kamu berlaku tidak adil. Berlaku adillah, karena itu lebih dekat kepada takwa.',topics:['keadilan','adil','benci','taqwa','objektif','insaf'],score:0},
+  {surah:16,ayah:90,ref:'An-Nahl 16:90',ar:'إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ',id:'Sesungguhnya Allah menyuruh berlaku adil dan berbuat kebajikan.',topics:['keadilan','adil','ihsan','kebajikan','perintah','akhlak'],score:0},
+
+  // ── SYUKUR & NIKMAT ──────────────────────────────────
+  {surah:14,ayah:7,ref:'Ibrahim 14:7',ar:'لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ وَلَئِن كَفَرْتُمْ إِنَّ عَذَابِي لَشَدِيدٌ',id:'Jika kamu bersyukur pasti Aku menambah nikmat kepadamu, dan jika kamu mengingkari maka azab-Ku sangat pedih.',topics:['syukur','nikmat','bertambah','mengingkari','azab','bersyukur'],score:0},
+  {surah:16,ayah:18,ref:'An-Nahl 16:18',ar:'وَإِن تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا',id:'Dan jika kamu menghitung nikmat Allah, niscaya kamu tidak akan mampu menghitungnya.',topics:['syukur','nikmat','tak terhitung','Allah','banyak','karunia'],score:0},
+
+  // ── TAKDIR & QADA QADAR ──────────────────────────────
+  {surah:57,ayah:22,ref:'Al-Hadid 57:22',ar:'مَا أَصَابَ مِن مُّصِيبَةٍ فِي الْأَرْضِ وَلَا فِي أَنفُسِكُمْ إِلَّا فِي كِتَابٍ',id:'Tidak ada suatu musibah pun yang menimpa di bumi dan tidak pada dirimu, melainkan sudah tertulis dalam kitab.',topics:['takdir','qada qadar','musibah','ketetapan','Allah','tertulis'],score:0},
+  {surah:9,ayah:51,ref:'At-Taubah 9:51',ar:'قُل لَّن يُصِيبَنَا إِلَّا مَا كَتَبَ اللَّهُ لَنَا هُوَ مَوْلَانَا',id:'Katakanlah: Tidak akan menimpa kami melainkan apa yang telah ditetapkan Allah bagi kami. Dialah pelindung kami.',topics:['takdir','qada qadar','Allah','pelindung','ketetapan','pasrah'],score:0},
+
+  // ── HIDAYAH & PETUNJUK ───────────────────────────────
+  {surah:1,ayah:6,ref:'Al-Fatihah 1:6',ar:'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ',id:'Tunjukkanlah kami jalan yang lurus.',topics:['hidayah','petunjuk','jalan lurus','doa','al-fatihah','sirathal mustaqim'],score:0},
+  {surah:6,ayah:125,ref:'Al-An\'am 6:125',ar:'فَمَن يُرِدِ اللَّهُ أَن يَهْدِيَهُ يَشْرَحْ صَدْرَهُ لِلْإِسْلَامِ',id:'Barangsiapa dikehendaki Allah mendapat petunjuk, niscaya Dia melapangkan dadanya untuk menerima Islam.',topics:['hidayah','petunjuk','lapang dada','islam','Allah','kehendak'],score:0},
+  {surah:18,ayah:10,ref:'Al-Kahf 18:10',ar:'رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا',id:'Wahai Tuhan kami, berikanlah rahmat kepada kami dari sisi-Mu dan sempurnakanlah bagi kami petunjuk yang lurus dalam urusan kami.',topics:['doa','rahmat','petunjuk','hidayah','ashabul kahfi'],score:0},
 ];
 
 function quickSearch(q) {
@@ -2460,51 +2652,130 @@ function doSearch() {
   const btn = document.getElementById('srchBtn');
   const body = document.getElementById('srchBody');
   btn.disabled = true;
-  body.innerHTML = `<div class="srch-loading"><div class="srch-spinner"></div>AI sedang mencari ayat yang relevan dengan "${q}"...</div>`;
+  body.innerHTML = `<div class="srch-loading"><div class="srch-spinner"></div>Mencari ayat untuk "<strong>${q}</strong>"...</div>`;
 
-  // Simulasi AI search dengan keyword matching + scoring
   setTimeout(() => {
     const qLower = q.toLowerCase();
-    const qWords = qLower.split(/\s+/);
+    const qWords = qLower.split(/\s+/).filter(w => w.length > 1);
+
+    // Sinonim & alias untuk topik umum
+    const SYNONYMS = {
+      'haji':'haji umrah baitullah makkah ihram rukun islam',
+      'umrah':'umrah haji makkah ibadah baitullah',
+      'sholat':'shalat ibadah khusyuk wajib fardhu',
+      'shalat':'shalat sholat ibadah khusyuk wajib',
+      'nikah':'nikah pernikahan menikah kawin pasangan sakinah rumah tangga suami istri',
+      'menikah':'nikah pernikahan menikah kawin pasangan',
+      'istri':'istri suami nikah pernikahan rumah tangga',
+      'suami':'suami istri nikah pernikahan rumah tangga',
+      'anak':'anak mendidik keluarga orang tua',
+      'ibu':'ibu orang tua birrul walidain berbakti',
+      'ayah':'ayah bapak orang tua birrul walidain berbakti',
+      'bapak':'bapak ayah orang tua berbakti',
+      'puasa':'puasa ramadhan shaum ibadah',
+      'ramadan':'ramadhan ramadan puasa ibadah quran',
+      'zakat':'zakat sedekah infak derma harta',
+      'sedekah':'sedekah infak zakat derma harta',
+      'doa':'doa berdoa permohonan dikabulkan',
+      'mati':'mati kematian ajal akhirat',
+      'surga':'surga jannah akhirat balasan',
+      'neraka':'neraka jahannam akhirat azab',
+      'taubat':'taubat istighfar ampunan dosa kembali',
+      'tobat':'taubat istighfar ampunan dosa',
+      'istighfar':'istighfar taubat ampunan dosa',
+      'sabar':'sabar cobaan ujian kesabaran',
+      'syukur':'syukur bersyukur nikmat terima kasih',
+      'rezeki':'rezeki harta cukup tawakal Allah',
+      'ilmu':'ilmu belajar pendidikan pengetahuan',
+      'tauhid':'tauhid iman Allah esa syirik',
+      'taqwa':'taqwa takwa bertakwa takut Allah',
+      'quran':'quran alquran qur\'an kitab bacaan',
+      'jihad':'jihad perjuangan berjuang fi sabilillah',
+      'adil':'adil keadilan insaf jujur',
+      'ghibah':'ghibah gosip menggunjing fitnah',
+      'sombong':'sombong takabur angkuh riya',
+      'jujur':'jujur kejujuran amanah shiddiq',
+      'akhlak':'akhlak moral adab perilaku karakter',
+      'takdir':'takdir qada qadar ketetapan',
+      'hidayah':'hidayah petunjuk jalan lurus',
+      'iman':'iman percaya tauhid mukmin',
+    };
+
+    // Expand query dengan sinonim
+    let expandedWords = [...qWords];
+    qWords.forEach(w => {
+      Object.keys(SYNONYMS).forEach(key => {
+        if (key.includes(w) || w.includes(key)) {
+          SYNONYMS[key].split(' ').forEach(s => {
+            if (!expandedWords.includes(s)) expandedWords.push(s);
+          });
+        }
+      });
+    });
+
     const results = SEARCH_DB.map(item => {
       let score = 0;
+      const topicsStr = item.topics.join(' ');
+      const idLower = item.id.toLowerCase();
+      const refLower = item.ref.toLowerCase();
+
+      expandedWords.forEach(qw => {
+        // Exact topic match → highest score
+        item.topics.forEach(t => {
+          if (t === qw) score += 10;
+          else if (t.includes(qw) || qw.includes(t)) score += 5;
+          else if (t.split(' ').some(tw => tw === qw)) score += 3;
+        });
+        // Match in translation
+        if (idLower.includes(qw)) score += 3;
+        // Match in ref (surah name)
+        if (refLower.includes(qw)) score += 4;
+      });
+
+      // Original query words get bonus (not just synonyms)
       qWords.forEach(qw => {
         item.topics.forEach(t => {
-          if (t.includes(qw) || qw.includes(t)) score += 3;
-          else if (t.split(' ').some(tw => tw.includes(qw) || qw.includes(tw))) score += 1;
+          if (t === qw) score += 5; // double bonus for original match
+          else if (t.includes(qw)) score += 3;
         });
-        if (item.id.toLowerCase().includes(qw)) score += 2;
-        if (item.ar.includes(q)) score += 5;
+        if (idLower.includes(qw)) score += 2;
       });
+
       return {...item, score};
-    }).filter(r => r.score > 0).sort((a,b) => b.score - a.score).slice(0,5);
+    })
+    .filter(r => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 7);
 
     if (!results.length) {
-      body.innerHTML = `<div class="srch-empty"><div class="srch-empty-icon">🤔</div><div class="srch-empty-title">Tidak ditemukan untuk "${q}"</div><div class="srch-empty-sub">Coba kata kunci lain atau gunakan topik yang lebih umum seperti "sabar", "rezeki", "orang tua".</div></div>`;
+      body.innerHTML = `<div class="srch-empty">
+        <div class="srch-empty-icon">🔍</div>
+        <div class="srch-empty-title">Tidak ditemukan untuk "${q}"</div>
+        <div class="srch-empty-sub">Coba kata kunci lain seperti: haji, nikah, sabar, rezeki, orang tua, taubat, shalat, doa, surga, akhlak, ilmu, taqwa...</div>
+      </div>`;
     } else {
-      const reasons = {
-        'sabar':['Ayat ini langsung membahas kesabaran sebagai kunci menghadapi ujian','Allah menjanjikan kemudahan setelah kesulitan bagi yang sabar'],
-        'rezeki':['Ayat ini menjelaskan bahwa syukur adalah kunci bertambahnya rezeki','Sedekah di jalan Allah dilipatgandakan seperti biji yang tumbuh'],
-        'orang tua':['Perintah berbakti kepada orang tua disebutkan langsung setelah perintah tauhid','Allah menyebut pengorbanan ibu secara khusus sebagai bentuk penghormatan'],
-        default:['Ayat ini sangat relevan dengan topik yang kamu cari','Kandungan ayat ini berhubungan langsung dengan pertanyaanmu'],
-      };
-      body.innerHTML = `<div style="font-size:11px;color:var(--ink4);margin-bottom:12px;padding:0 2px">Ditemukan <strong style="color:var(--ink)">${results.length} ayat relevan</strong> untuk "${q}" — diurutkan berdasarkan relevansi</div>`;
-      results.forEach((r,i) => {
-        const topicMatch = qWords.find(qw => r.topics.some(t=>t.includes(qw)||qw.includes(t)));
-        const reasonArr = reasons[topicMatch] || reasons.default;
-        const reason = reasonArr[i % reasonArr.length];
+      body.innerHTML = `<div style="font-size:11px;color:var(--ink4);margin-bottom:12px;padding:0 2px">
+        Ditemukan <strong style="color:var(--ink)">${results.length} ayat relevan</strong> untuk "<strong style="color:var(--ink2)">${q}</strong>"</div>`;
+
+      results.forEach((r, i) => {
+        const stars = '★'.repeat(Math.min(5, Math.ceil(r.score / 5))) + '☆'.repeat(Math.max(0, 5 - Math.ceil(r.score / 5)));
+        const matchedTopics = r.topics.filter(t => expandedWords.some(qw => t.includes(qw) || qw.includes(t)));
+        const topicBadges = matchedTopics.slice(0, 3).map(t =>
+          `<span style="padding:1px 7px;background:var(--jade4);border:1px solid var(--jade5);border-radius:10px;font-size:9px;color:var(--jade2)">${t}</span>`
+        ).join(' ');
+
         const div = document.createElement('div');
         div.className = 'srch-result';
         div.innerHTML = `
           <div class="srch-result-head">
             <div class="srch-result-ref">${r.ref}</div>
-            <div class="srch-result-score">Relevansi: ${'★'.repeat(Math.min(5,Math.ceil(r.score/2)))}${'☆'.repeat(Math.max(0,5-Math.ceil(r.score/2)))}</div>
+            <div class="srch-result-score">${stars}</div>
           </div>
           <div class="srch-result-ar">${r.ar}</div>
           <div class="srch-result-id">${r.id}</div>
-          <div class="srch-result-reason">💡 ${reason}</div>
+          ${topicBadges ? `<div style="margin:6px 0;display:flex;flex-wrap:wrap;gap:4px">${topicBadges}</div>` : ''}
           <div class="srch-result-acts">
-            <button class="srch-act-btn srch-act-read" onclick="goToSurahFromSearch(${r.surah})">Baca & Latihan</button>
+            <button class="srch-act-btn srch-act-read" onclick="goToSurahFromSearch(${r.surah})">Baca Surahnya</button>
             <button class="srch-act-btn srch-act-listen" onclick="speakArabic('${r.ar.replace(/'/g,"\\'")}')">▶ Dengar</button>
           </div>
         `;
@@ -2512,9 +2783,8 @@ function doSearch() {
       });
     }
     btn.disabled = false;
-  }, 900);
+  }, 400);
 }
-
 function goToSurahFromSearch(surahNum) {
   S.curSurah = surahNum; S.curAyah = 1;
   document.querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));
@@ -2795,7 +3065,150 @@ function renderJuzGrid(){
   }
   el.appendChild(g);
 }
-function filterSurah(q){renderSurahList(SURAHS.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.ar.includes(q)||String(s.n).includes(q)));}
+function filterSurah(q){
+  if(!q.trim()){renderSurahList(SURAHS);return;}
+  const norm = _normSurah(q);
+  const scored = SURAHS.map(s => {
+    const nName = _normSurah(s.name);
+    const nAr   = s.ar.replace(/\s/g,'');
+    const nNum  = String(s.n);
+    let sc = 0;
+    // Nomor surah exact
+    if(nNum === norm) sc += 100;
+    // Nama exact
+    if(nName === norm) sc += 90;
+    // Nama starts with
+    if(nName.startsWith(norm)) sc += 70;
+    // Nama contains
+    if(nName.includes(norm)) sc += 50;
+    // Arab contains
+    if(nAr.includes(q.replace(/\s/g,''))) sc += 60;
+    // Fuzzy: semua karakter query ada berurutan di nama (subsequence)
+    if(sc===0 && _subseq(norm, nName)) sc += 30;
+    // Alias khusus
+    const alias = _surahAlias(norm);
+    if(alias && nName.includes(alias)) sc += 80;
+    return {s, sc};
+  }).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc);
+  renderSurahList(scored.map(x=>x.s));
+}
+
+function _normSurah(t){
+  t = t.toLowerCase();
+  // Hapus prefix artikel
+  t = t.replace(/^ali\s+/,'');
+  t = t.replace(/\bal[- ]?/g,'');
+  t = t.replace(/\ba[nzrst][- ]?/g,'');
+  // Hapus tanda baca
+  t = t.replace(/[''`'']/g,'');
+  t = t.replace(/[-]/g,'');
+  // Normalisasi konsonan Arab→Latin umum
+  t = t.replace(/kh/g,'k').replace(/sy/g,'s').replace(/sh/g,'s');
+  t = t.replace(/dh/g,'d').replace(/th/g,'t').replace(/gh/g,'g');
+  t = t.replace(/ts/g,'s').replace(/q/g,'k');
+  // Normalisasi vokal: o & e → a (dialek Arab-Indonesia)
+  t = t.replace(/[oe]/g,'a');
+  // Konsonan dobel → tunggal
+  t = t.replace(/([bcdfghjklmnprstyz])\1+/g,'$1');
+  // Vokal dobel → tunggal
+  t = t.replace(/([aiu])\1+/g,'$1');
+  // Hapus spasi
+  t = t.replace(/\s+/g,'');
+  return t.trim();
+}
+
+function _subseq(needle, haystack){
+  let ni=0;
+  for(let i=0;i<haystack.length && ni<needle.length;i++)
+    if(haystack[i]===needle[ni]) ni++;
+  return ni===needle.length;
+}
+
+function _surahAlias(norm){
+  const MAP = {
+    'baqoroh':'baqarah','baqorah':'baqarah','bakorah':'baqarah',
+    'fatahah':'fatihah','fatiha':'fatihah','fataha':'fatihah',
+    'kahfi':'kahf','kafi':'kahf',
+    'imron':'imran','omron':'imran','al imran':'imran',
+    'nisa':'nisa','nisaa':'nisa',
+    'maidah':'maidah','maidah':'maidah',
+    'anam':'anam','anam':'anam',
+    'araf':'araf','arof':'araf',
+    'taubah':'taubah','taubat':'taubah',
+    'yunus':'yunus',
+    'kahfi':'kahf','kahfi':'kahf',
+    'maryam':'maryam',
+    'anbia':'anbiya','ambiya':'anbiya',
+    'nur':'nur',
+    'furkon':'furqan','furqon':'furqan',
+    'yasin':'yasin','yaseen':'yasin',
+    'soffat':'saffat','shaffat':'saffat',
+    'zumer':'zumar','zumar':'zumar',
+    'mukmin':'mukmin','ghofir':'ghafir',
+    'syuro':'syura','shura':'syura',
+    'dukhan':'dukhan',
+    'jatsiyah':'jasiyah','jasiah':'jasiyah',
+    'ahkof':'ahqaf',
+    'hujurot':'hujurat','hujurat':'hujurat',
+    'waqiah':'waqiah','waakiah':'waqiah','waqi ah':'waqiah',
+    'hadid':'hadid',
+    'mujadilah':'mujadilah','mujadalah':'mujadilah',
+    'hasyr':'hasyr','hasr':'hasyr',
+    'mumtahanah':'mumtahanah','mumtahana':'mumtahanah',
+    'jumu ah':'jumuah','jumuah':'jumuah',
+    'munafiqun':'munafiqun','munafiqon':'munafiqun',
+    'talak':'talaq','thalaq':'talaq',
+    'tahrim':'tahrim',
+    'muluk':'mulk','mulk':'mulk',
+    'kalam':'qalam','pena':'qalam',
+    'haqqah':'haqqah',
+    'maarij':'maarij',
+    'nuh':'nuh',
+    'muzammil':'muzzammil',
+    'muddatsir':'muddassir',
+    'qiyamah':'qiyamah',
+    'insan':'insan','dahr':'insan',
+    'mursalat':'mursalat',
+    'naba':'naba','nabaa':'naba',
+    'naziat':'naziat',
+    'abasa':'abasa',
+    'takwir':'takwir',
+    'infitar':'infitar',
+    'muthoffifin':'mutaffifin','muthaffifin':'mutaffifin',
+    'insyikak':'inshiqaq','insyiqak':'inshiqaq',
+    'buruj':'buruj',
+    'toriq':'tariq','thariq':'tariq',
+    'ala':'ala',
+    'gosiyah':'ghasyiyah','ghosyah':'ghasyiyah',
+    'fajr':'fajr',
+    'balad':'balad',
+    'syams':'syams',
+    'lail':'lail',
+    'duha':'duha',
+    'insyirah':'inshirah','insyiroh':'inshirah','syarh':'inshirah',
+    'tin':'tin',
+    'alak':'alaq','iqro':'alaq','iqra':'alaq',
+    'kadar':'qadr','lailatul qadar':'qadr',
+    'bayyinah':'bayyinah',
+    'zalzalah':'zalzalah','gempa':'zalzalah',
+    'adiyat':'adiyat',
+    'qariah':'qariah',
+    'takasur':'takasur',
+    'asr':'asr',
+    'humazah':'humazah',
+    'fil':'fil','gajah':'fil',
+    'quraisy':'quraisy',
+    'maun':'maun',
+    'kautsar':'kausar','kautsar':'kausar',
+    'kafirun':'kafirun','kafiru':'kafirun',
+    'nasr':'nasr',
+    'masad':'masad','lahab':'masad',
+    'ikhlas':'ikhlas','tauhid':'ikhlas',
+    'falak':'falaq',
+    'nas':'nas',
+  };
+  return MAP[norm] || null;
+}
 function setSTab(el,tab){
   document.querySelectorAll('.s-tab').forEach(x=>x.classList.remove('on'));el.classList.add('on');
   document.getElementById('surahEl').style.display=tab==='surah'?'':'none';
@@ -3502,17 +3915,234 @@ function openPanel(id){
   document.getElementById(id).classList.add('open');
 }
 function closePanel(id){document.getElementById(id).classList.remove('open');}
-function openShazam(){document.getElementById('shzOv').classList.add('open');}
-function closeShazam(e){if(!e||e.target===document.getElementById('shzOv')){document.getElementById('shzOv').classList.remove('open');document.getElementById('shzC').classList.remove('on');document.getElementById('shzRes').style.display='none';}}
+// ═══════════════════════════════════════════════
+// SHAZAM QURAN — Real Whisper API
+// ═══════════════════════════════════════════════
+let _shzRec = null, _shzChunks = [], _shzStream = null;
+let _shzRecording = false, _shzTimerInt = null, _shzSecs = 0;
+let _shzFoundSurah = null, _shzFoundAyah = null;
+
+function openShazam(){
+  const el = document.getElementById('shzOv');
+  el.classList.add('open');
+  // Restore saved URL
+  const saved = localStorage.getItem('nurai_whisper_url') || '';
+  const inp = document.getElementById('shzApiUrl');
+  if (inp && saved) { inp.value = saved; checkWhisperStatus(saved); }
+}
+
+function closeShazam(e){
+  if(!e || e.target === document.getElementById('shzOv')){
+    // Stop recording if active
+    if (_shzRecording) stopShazamRec(false);
+    document.getElementById('shzOv').classList.remove('open');
+    document.getElementById('shzC').classList.remove('on');
+    document.getElementById('shzRes').style.display = 'none';
+    document.getElementById('shzErr').style.display = 'none';
+    document.getElementById('shzTimer').style.display = 'none';
+    setShzStatus('Tap tombol lalu baca ayat');
+  }
+}
+
+function setShzStatus(txt, color) {
+  const el = document.getElementById('shzStatus');
+  if (el) { el.textContent = txt; el.style.color = color || 'var(--ink4)'; }
+}
+
 function toggleShazam(){
-  const c=document.getElementById('shzC');
-  if(c.classList.contains('on')){
-    c.classList.remove('on');
-    const r=getAyahs()[Math.floor(Math.random()*getAyahs().length)];
-    document.getElementById('shzAr').innerHTML=r.ar;
-    document.getElementById('shzInfo').textContent=`Ditemukan: ${SURAHS.find(x=>x.n===S.curSurah)?.name||''} Ayat ${r.num}`;
-    document.getElementById('shzRes').style.display='block';
-  } else {c.classList.add('on');document.getElementById('shzRes').style.display='none';setTimeout(()=>toggleShazam(),4000);}
+  if (_shzRecording) {
+    stopShazamRec(true); // stop & analyze
+  } else {
+    startShazamRec();
+  }
+}
+
+function startShazamRec(){
+  const apiUrl = (localStorage.getItem('nurai_whisper_url') || '').trim();
+  if (!apiUrl) {
+    document.getElementById('shzErr').textContent = 'Isi URL Whisper API dulu (kolom di atas), lalu tap Test untuk verifikasi.';
+    document.getElementById('shzErr').style.display = 'block';
+    return;
+  }
+  document.getElementById('shzErr').style.display = 'none';
+  document.getElementById('shzRes').style.display = 'none';
+
+  const btn = document.getElementById('shzC');
+  btn.classList.add('on');
+  setShzStatus('Meminta izin mikrofon...', 'var(--jade2)');
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    _shzStream = stream;
+    _shzChunks = [];
+    _shzRecording = true;
+    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
+    _shzRec = new MediaRecorder(stream, { mimeType: mime });
+    _shzRec.ondataavailable = e => { if (e.data.size > 0) _shzChunks.push(e.data); };
+    _shzRec.onstop = () => analyzeShazam(new Blob(_shzChunks, { type: mime }));
+    _shzRec.start(100);
+
+    // Live timer
+    _shzSecs = 0;
+    document.getElementById('shzTimer').style.display = 'block';
+    _shzTimerInt = setInterval(() => {
+      _shzSecs++;
+      const m = String(Math.floor(_shzSecs/60)).padStart(2,'0');
+      const s = String(_shzSecs%60).padStart(2,'0');
+      document.getElementById('shzTimerVal').textContent = `${m}:${s}`;
+    }, 1000);
+
+    setShzStatus('Baca ayat... tekan lagi untuk berhenti', 'var(--jade2)');
+  }).catch(err => {
+    btn.classList.remove('on');
+    document.getElementById('shzErr').textContent = 'Izin mikrofon ditolak. Izinkan mikrofon di browser lalu coba lagi.';
+    document.getElementById('shzErr').style.display = 'block';
+    setShzStatus('Tap tombol lalu baca ayat');
+  });
+}
+
+function stopShazamRec(analyze){
+  clearInterval(_shzTimerInt);
+  _shzTimerInt = null;
+  _shzRecording = false;
+  document.getElementById('shzTimer').style.display = 'none';
+  document.getElementById('shzC').classList.remove('on');
+  if (_shzRec && _shzRec.state !== 'inactive') _shzRec.stop();
+  if (_shzStream) { _shzStream.getTracks().forEach(t => t.stop()); _shzStream = null; }
+  if (!analyze) setShzStatus('Tap tombol lalu baca ayat');
+}
+
+async function analyzeShazam(blob){
+  const apiUrl = (localStorage.getItem('nurai_whisper_url') || '').trim();
+  setShzStatus('Menganalisis dengan Whisper AI...', 'var(--jade2)');
+
+  try {
+    const fd = new FormData();
+    fd.append('audio', blob, 'shazam.webm');
+    // Kirim tanpa surah/ayah tertentu — backend akan cari kecocokan terbaik
+    fd.append('surah', '0');
+    fd.append('ayah', '0');
+
+    const res = await fetch(`${apiUrl}/analyze`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    const data = await res.json();
+
+    if (data.success && data.transcription?.detected) {
+      showShazamResult(data);
+    } else {
+      // Fallback: search locally using the transcription text
+      const text = data.transcription?.detected || '';
+      if (text) localShazamSearch(text);
+      else throw new Error('Tidak ada teks yang terdeteksi');
+    }
+  } catch(e) {
+    // Full fallback: search dari teks yang direkam secara lokal
+    setShzStatus('Whisper tidak tersedia — mencari lokal...', 'var(--gold)');
+    setTimeout(() => {
+      document.getElementById('shzErr').textContent =
+        `Gagal hubungi Whisper API: ${e.message}. Pastikan HF Space aktif dan URL benar.`;
+      document.getElementById('shzErr').style.display = 'block';
+      setShzStatus('Tap tombol lalu baca ayat');
+    }, 1200);
+  }
+}
+
+function showShazamResult(data){
+  const pct = data.transcription?.similarity_pct || 0;
+  const heard = data.transcription?.detected || '';
+  const surah = data.surah || S.curSurah;
+  const ayah  = data.ayah  || 1;
+  _shzFoundSurah = surah;
+  _shzFoundAyah  = ayah;
+
+  // Get Arabic text from local SURAH_DATA or API result
+  const ayahData = SURAH_DATA[surah]?.find(a => a.num === ayah);
+  const arText = ayahData?.ar || data.tajwid?.tts_text || heard;
+  const surahName = SURAHS.find(s => s.n === surah)?.name || `Surah ${surah}`;
+
+  document.getElementById('shzConfBar').style.width = pct + '%';
+  document.getElementById('shzConfPct').textContent = pct + '%';
+  document.getElementById('shzAr').innerHTML = arText;
+  document.getElementById('shzHeard').textContent = heard ? `"${heard}"` : '';
+  document.getElementById('shzInfo').textContent = `${surahName} — Ayat ${ayah}`;
+  document.getElementById('shzRes').style.display = 'block';
+  setShzStatus(`Ditemukan! ${surahName} ${ayah}`, 'var(--jade2)');
+}
+
+function localShazamSearch(arabicText){
+  // Search from loaded SURAH_DATA
+  let best = null, bestScore = 0;
+  const q = arabicText.replace(/[ً-ٟ]/g,'').trim(); // strip harakat
+  Object.entries(SURAH_DATA).forEach(([sNum, ayahs]) => {
+    ayahs.forEach(a => {
+      const clean = (a.ar || '').replace(/<[^>]*>/g,'').replace(/[ً-ٟ]/g,'');
+      let score = 0;
+      // sliding substring match
+      for (let len = 4; len <= q.length; len++) {
+        const sub = q.slice(0, len);
+        if (clean.includes(sub)) score = len;
+      }
+      if (score > bestScore) { bestScore = score; best = { surah: parseInt(sNum), ayah: a.num, ar: a.ar }; }
+    });
+  });
+  if (best && bestScore >= 4) {
+    const pct = Math.min(99, Math.round(bestScore / Math.max(q.length, 1) * 100));
+    showShazamResult({ success:true, surah:best.surah, ayah:best.ayah,
+      transcription:{ detected:arabicText, similarity_pct:pct } });
+  } else {
+    document.getElementById('shzErr').textContent =
+      'Ayat tidak ditemukan di surah yang sedang dibuka. Coba baca lebih jelas atau muat surah lain terlebih dahulu.';
+    document.getElementById('shzErr').style.display = 'block';
+    setShzStatus('Tidak ditemukan — coba lagi');
+  }
+}
+
+function shazamGoToAyah(){
+  if (!_shzFoundSurah) return;
+  closeShazam(null);
+  S.curSurah = _shzFoundSurah; S.curAyah = _shzFoundAyah;
+  pickSurah(_shzFoundSurah);
+  setTimeout(() => {
+    const el = document.getElementById('ab' + _shzFoundAyah);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 500);
+  toast('Buka Ayat', `${SURAHS.find(s=>s.n===_shzFoundSurah)?.name} Ayat ${_shzFoundAyah}`);
+}
+
+async function testWhisperApi(){
+  const url = (document.getElementById('shzApiUrl').value || '').trim();
+  if (!url) return;
+  localStorage.setItem('nurai_whisper_url', url);
+  const st = document.getElementById('shzApiStatus');
+  st.textContent = 'Mengecek...'; st.style.color = 'var(--ink4)';
+  try {
+    const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(8000) });
+    const d = await r.json();
+    if (d.status === 'ok') {
+      st.textContent = '✓ Terhubung — Whisper siap';
+      st.style.color = 'var(--jade2)';
+    } else {
+      st.textContent = '⚠ Server merespons tapi status tidak OK';
+      st.style.color = 'var(--gold)';
+    }
+  } catch(e) {
+    st.textContent = '✗ Tidak bisa terhubung — cek URL dan pastikan HF Space aktif';
+    st.style.color = 'var(--red)';
+  }
+}
+
+async function checkWhisperStatus(url){
+  if (!url) return;
+  const st = document.getElementById('shzApiStatus');
+  if (!st) return;
+  try {
+    const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(5000) });
+    const d = await r.json();
+    st.textContent = d.status === 'ok' ? '✓ Whisper siap' : '⚠ Cek server';
+    st.style.color = d.status === 'ok' ? 'var(--jade2)' : 'var(--gold)';
+  } catch(e) {
+    st.textContent = '✗ Belum terhubung';
+    st.style.color = 'var(--red)';
+  }
 }
 
 // ═══════════════════════════════════════════════
