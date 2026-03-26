@@ -157,7 +157,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 /* ══ MAIN APP ════════════════════════════════════════ */
 .app{display:flex;height:100vh;overflow:hidden;opacity:0;transition:opacity .4s}
 .app.ready{opacity:1}
-.sidebar{width:var(--sw);border-right:1px solid var(--paper3);display:flex;flex-direction:column;flex-shrink:0;background:var(--paper);transition:background .2s}
+.sidebar{width:var(--sw);border-right:1px solid var(--paper3);display:flex;flex-direction:column;flex-shrink:0;background:var(--paper);transition:background .2s;position:relative;z-index:1}
 
 /* Sidebar header */
 .sh{padding:14px 13px 11px;border-bottom:1px solid var(--paper3)}
@@ -664,12 +664,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 /* ══ RESPONSIVE ══════════════════════════════════════ */
 @media(max-width:680px){
   /* ── SIDEBAR ── */
-  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);transition:transform .25s ease;width:82vw;max-width:300px;box-shadow:4px 0 24px rgba(0,0,0,.2)}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:400;transform:translateX(-100%);transition:transform .25s ease;width:82vw;max-width:300px;box-shadow:4px 0 24px rgba(0,0,0,.2)}
   .sidebar.open{transform:translateX(0)}
   .sb-overlay{display:block}
 
   /* ── TOPBAR ── */
-  .hamburger{display:flex}
+  .hamburger{display:flex!important;min-width:38px}
   .topbar{padding:8px 12px;gap:8px;flex-wrap:nowrap;min-height:52px}
   .t-l{min-width:0;flex:1;overflow:hidden}
   .t-nm{font-size:13px;font-weight:700;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -776,8 +776,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 }
 
 /* Overlay gelap saat sidebar terbuka */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:299;backdrop-filter:blur(2px)}
-.hamburger{display:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--paper3);background:var(--paper2);cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:4px;flex-shrink:0}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:399;backdrop-filter:blur(2px)}
+.hamburger{display:none;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--paper3);background:var(--paper2);cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:4px;flex-shrink:0;position:relative;z-index:20;-webkit-tap-highlight-color:rgba(46,160,67,.2)}
 .hamburger span{width:16px;height:1.5px;background:var(--ink);border-radius:1px;transition:.2s}
 
 /* ══ PRAYER MINI WIDGET (mobile sticky) ══════════════ */
@@ -1658,38 +1658,10 @@ const SURAH_DATA_EXT = {
     {num:5,ar:'الَّذِي يُوَسْوِسُ فِي صُدُورِ <span class="mad ghunnah">النَّاسِ</span>',id:'yang membisikkan (kejahatan) ke dalam dada manusia,',rules:['mad','ghunnah','idgham']},
     {num:6,ar:'مِنَ <span class="mad">الْجِنَّةِ</span> وَالنَّاسِ',id:'dari (golongan) jin dan manusia."',rules:['mad','ghunnah']},
   ],
-  36: [ // Yasin (hanya 10 ayat pertama)
-    {num:1,ar:'<span class="mad">يس</span>',id:'Yaa Siin.',rules:['mad']},
-    {num:2,ar:'وَالْقُرْآنِ <span class="mad2">الْحَكِيمِ</span>',id:'Demi Al-Qur\'an yang penuh hikmah.',rules:['mad2']},
-    {num:3,ar:'إِنَّكَ لَمِنَ <span class="mad ghunnah">الْمُرْسَلِينَ</span>',id:'Sungguh, engkau (Muhammad) adalah salah seorang dari rasul-rasul,',rules:['mad','ghunnah']},
-    {num:4,ar:'عَلَىٰ صِرَاطٍ <span class="mad tafkhim">مُّسْتَقِيمٍ</span>',id:'(yang berada) di atas jalan yang lurus,',rules:['mad','tafkhim']},
-    {num:5,ar:'تَنزِيلَ <span class="mad">الْعَزِيزِ</span> الرَّحِيمِ',id:'(sebagai wahyu) yang diturunkan oleh (Allah) Yang Mahaperkasa, Maha Penyayang,',rules:['mad']},
-  ],
-  67: [ // Al-Mulk (5 ayat pertama)
-    {num:1,ar:'تَبَارَكَ الَّذِي بِيَدِهِ <span class="mad2">الْمُلْكُ</span> وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',id:'Mahasuci Allah yang menguasai (segala) kerajaan, dan Dia Mahakuasa atas segala sesuatu.',rules:['mad2','qalqalah']},
-    {num:2,ar:'الَّذِي خَلَقَ <span class="mad">الْمَوْتَ</span> وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا وَهُوَ <span class="mad">الْعَزِيزُ</span> الْغَفُورُ',id:'Yang menciptakan mati dan hidup, untuk menguji kamu, siapa di antara kamu yang lebih baik amalnya.',rules:['mad']},
-    {num:3,ar:'الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا مَّا تَرَىٰ فِي خَلْقِ <span class="ghunnah mad">الرَّحْمَٰنِ</span> مِن تَفَاوُتٍ',id:'Yang menciptakan tujuh langit berlapis-lapis. Tidak akan kamu lihat sesuatu yang tidak seimbang pada ciptaan Allah Yang Maha Pengasih.',rules:['ghunnah','mad']},
-  ],
-  55: [ // Ar-Rahman (10 ayat pertama)
-    {num:1,ar:'<span class="mad ghunnah">الرَّحْمَٰنُ</span>',id:'(Allah) Yang Maha Pengasih,',rules:['mad','ghunnah']},
-    {num:2,ar:'عَلَّمَ <span class="mad2">الْقُرْآنَ</span>',id:'Yang telah mengajarkan Al-Qur\'an.',rules:['mad2']},
-    {num:3,ar:'خَلَقَ <span class="mad">الْإِنسَانَ</span>',id:'Dia menciptakan manusia,',rules:['mad']},
-    {num:4,ar:'عَلَّمَهُ <span class="mad">الْبَيَانَ</span>',id:'mengajarnya pandai berbicara.',rules:['mad']},
-    {num:5,ar:'الشَّمْسُ وَالْقَمَرُ بِحُسْبَانٍ',id:'Matahari dan bulan beredar menurut perhitungan,',rules:[]},
-    {num:6,ar:'وَالنَّجْمُ وَالشَّجَرُ <span class="mad">يَسْجُدَانِ</span>',id:'dan tumbuh-tumbuhan dan pepohonan, keduanya tunduk (kepada-Nya).',rules:['mad']},
-    {num:7,ar:'وَالسَّمَاءَ رَفَعَهَا وَوَضَعَ <span class="mad">الْمِيزَانَ</span>',id:'Dan langit telah ditinggikan-Nya dan Dia meletakkan neraca (keadilan).',rules:['mad']},
-    {num:8,ar:'أَلَّا تَطْغَوْا فِي <span class="mad">الْمِيزَانِ</span>',id:'Agar kamu jangan merusak keseimbangan itu.',rules:['mad']},
-    {num:9,ar:'وَأَقِيمُوا الْوَزْنَ بِالْقِسْطِ وَلَا تُخْسِرُوا <span class="mad">الْمِيزَانَ</span>',id:'Dan tegakkanlah keseimbangan itu dengan adil dan janganlah kamu mengurangi keseimbangan itu.',rules:['mad']},
-    {num:10,ar:'وَالْأَرْضَ وَضَعَهَا لِلْأَنَامِ',id:'Dan bumi telah dibentangkan-Nya untuk makhluk(-Nya),',rules:[]},
-    {num:13,ar:'فَبِأَيِّ آلَاءِ رَبِّكُمَا <span class="mad2 ghunnah">تُكَذِّبَانِ</span>',id:'Maka nikmat Tuhanmu yang manakah yang kamu dustakan?',rules:['mad2','ghunnah']},
-  ],
-  18: [ // Al-Kahf (5 ayat pertama)
-    {num:1,ar:'الْحَمْدُ لِلَّهِ الَّذِي أَنزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَل لَّهُ <span class="mad2">عِوَجًا</span>',id:'Segala puji bagi Allah yang telah menurunkan Kitab (Al-Qur\'an) kepada hamba-Nya dan Dia tidak menjadikannya bengkok.',rules:['mad2','idgham']},
-    {num:2,ar:'قَيِّمًا لِّيُنذِرَ بَأْسًا شَدِيدًا مِّن لَّدُنْهُ وَيُبَشِّرَ <span class="mad ghummah">الْمُؤْمِنِينَ</span>',id:'(Sebagai Kitab yang) lurus, untuk memperingatkan akan siksa yang sangat pedih dari sisi-Nya dan memberi kabar gembira kepada orang-orang mukmin.',rules:['mad','ghunnah','idgham']},
-    {num:3,ar:'الَّذِينَ يَعْمَلُونَ الصَّالِحَاتِ أَنَّ لَهُمْ أَجْرًا <span class="mad ghunnah">حَسَنًا</span>',id:'yang mengerjakan kebajikan, bahwa mereka akan mendapat pahala yang baik,',rules:['mad','ghunnah']},
-    {num:4,ar:'مَّاكِثِينَ فِيهِ <span class="mad">أَبَدًا</span>',id:'mereka kekal di dalamnya untuk selama-lamanya,',rules:['mad']},
-    {num:5,ar:'وَيُنذِرَ الَّذِينَ قَالُوا اتَّخَذَ اللَّهُ <span class="mad qalqalah">وَلَدًا</span>',id:'dan untuk memperingatkan orang-orang yang berkata: "Allah mengambil seorang anak."',rules:['mad','qalqalah']},
-  ],
+  // 36: di-fetch dari API (data lengkap)
+  // 67: di-fetch dari API (data lengkap)
+  // 55: di-fetch dari API (data lengkap)
+  // 18: di-fetch dari API (data lengkap)
 };
 
 // Override SURAH_DATA dengan versi extended
@@ -2126,7 +2098,7 @@ function setupPlayback(blob) {
   };
   // Tampilkan playback bar
   document.getElementById('recPlaybackWrap').classList.add('show');
-  document.getElementById('recSub').textContent = '✓ Rekaman tersimpan — tap ▶ untuk diputar';
+  document.getElementById('recSub').textContent = '✓ Rekaman tersimpan — tap ▶ untuk dengar suaramu';
   // Tampilkan tombol di modal skor
   const sc = document.getElementById('scPlayRecBtn');
   if (sc) { sc.style.display = ''; sc.textContent = '▶ Dengar Rekaman'; }
@@ -2968,11 +2940,21 @@ function getLocalFallback(msg) {
 // ═══════════════════════════════════════════════
 const QURAN_CACHE_KEY = 'nurai_quran_v4';
 
-// Bersihkan SEMUA cache surah lama
+// Bersihkan cache surah yang tidak lengkap (versi lama mungkin parsial)
 (()=>{
   const keys = Object.keys(localStorage).filter(k => k.startsWith('nurai_surah_') || k.startsWith('nurai_quran_'));
-  keys.forEach(k => localStorage.removeItem(k));
-  console.log('Cache cleared:', keys.length, 'items');
+  keys.forEach(k => {
+    try {
+      const data = JSON.parse(localStorage.getItem(k) || '[]');
+      const surahNum = parseInt(k.replace('nurai_surah_',''));
+      // Hapus cache jika jumlah ayat tidak sesuai ekspektasi
+      const expectedMin = {36:80, 67:28, 55:75, 18:100, 2:280, 3:195, 4:170};
+      if (expectedMin[surahNum] && data.length < expectedMin[surahNum]) {
+        localStorage.removeItem(k);
+        console.log('Cleared incomplete cache for surah', surahNum, '(had', data.length, 'ayat)');
+      }
+    } catch(e) { localStorage.removeItem(k); }
+  });
 })();
 const QURAN_API = 'https://api.quran.com/api/v4';
 
@@ -3050,30 +3032,39 @@ async function getAyahsAsync(surahNum) {
 
 // Pre-fetch surah yang sering dipakai saat idle
 async function prefetchPopularSurahs() {
-  const popular = [1,2,18,36,55,56,67,78,87,93,94,95,96,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
+  // Surah paling sering dicari + semua Juz 30 (juz amma)
+  const popular = [
+    1,2,3,18,19,20,36,55,56,67,78,79,80,81,82,83,84,85,86,87,88,89,90,
+    91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,
+    110,111,112,113,114
+  ];
   for (const n of popular) {
-    if (!SURAH_DATA[n]) {
+    if (!SURAH_DATA[n] || (SURAH_DATA[n].length < 3 && n !== 108 && n !== 103 && n !== 110)) {
       await fetchSurah(n);
-      await new Promise(r => setTimeout(r, 200)); // Jeda agar tidak spam API
+      await new Promise(r => setTimeout(r, 150));
     }
   }
+  console.log('[NurAI] Prefetch selesai:', Object.keys(SURAH_DATA).length, 'surah ter-cache');
 }
 
 // ── MOBILE SIDEBAR ──────────────────────────────
 function toggleSidebar(){
   const sb = document.querySelector('.sidebar');
-  const ov = document.getElementById('sbOverlay');
-  const isOpen = sb.classList.contains('open');
-  if(isOpen){ closeSidebar(); }
+  if (!sb) return;
+  if(sb.classList.contains('open')){ closeSidebar(); }
   else {
     sb.classList.add('open');
-    ov.style.display = 'block';
+    const ov = document.getElementById('sbOverlay');
+    if(ov){ ov.style.display='block'; ov.style.zIndex='299'; }
+    document.body.style.overflow = 'hidden'; // prevent body scroll
   }
 }
 function closeSidebar(){
-  document.querySelector('.sidebar')?.classList.remove('open');
+  const sb = document.querySelector('.sidebar');
+  if(sb) sb.classList.remove('open');
   const ov = document.getElementById('sbOverlay');
-  if(ov) ov.style.display = 'none';
+  if(ov){ ov.style.display='none'; }
+  document.body.style.overflow = '';
 }
 
 function boot(){
@@ -3655,7 +3646,7 @@ function renderAyahs(){
     <div class="a-body">${txtHtml}
       <div class="a-acts">
         <button class="a-btn rec" onclick="recAyah(${a.num})"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>Rekam</button>
-        <button class="a-btn" onclick="playAudio(${a.num})" id="pb${a.num}"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Dengar</button>
+        <button class="a-btn" onclick="playAudio(${a.num})" id="pb${a.num}"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Qori</button>
         <button class="a-btn" onclick="toast('Ditandai ✓','Ayat ${a.num} ditambahkan ke bookmark.')"><svg viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>Tandai</button>
         ${scTag}${hafTag}
       </div>
@@ -3675,10 +3666,16 @@ function peekHaf(n){
 // RECORDING
 // ═══════════════════════════════════════════════
 function recAyah(n){
+  // Jika sedang rekam ayat lain, stop dulu
+  if(S.rec) finishRec(S.curAyah);
   S.curAyah=n;
   document.querySelectorAll('.ab').forEach(x=>x.classList.remove('rec-on'));
   const e=document.getElementById('ab'+n);if(e)e.classList.add('rec-on');
-  startRec();
+  // Scroll rec bar ke view
+  const recBar=document.querySelector('.rec-bar');
+  if(recBar) recBar.scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Mulai rekam
+  setTimeout(startRec, 100); // delay kecil agar scroll selesai
 }
 // ── LIVE RECORDING TIMER ─────────────────────────────
 let _recLiveTimer = null;
@@ -3774,7 +3771,7 @@ function finishRec(n){
 
   const nx = n < ayahs.length ? n + 1 : 1; S.curAyah = nx;
   document.getElementById('recLbl').textContent = `Rekam Ayat ${nx}`;
-  document.getElementById('recSub').textContent = 'Tekan mikrofon · TTS Indonesia aktif';
+  document.getElementById('recSub').textContent = 'Tap Rekam di tiap ayat, atau tekan tombol mikrofon ini';
 
   const fbs=[
     `Ayat ${n}: Mad Thabii pada kata اللَّهِ kurang panjang. Perpanjang 2 harakat, setara dua ketukan.`,
@@ -4067,10 +4064,16 @@ let _shzFoundSurah = null, _shzFoundAyah = null;
 function openShazam(){
   const el = document.getElementById('shzOv');
   el.classList.add('open');
-  // Restore saved URL
-  const saved = localStorage.getItem('nurai_whisper_url') || '';
+  // Auto-set URL default jika belum ada
+  const DEFAULT_HF = 'https://fastnetkesilir-nurai-whisper.hf.space';
+  let saved = localStorage.getItem('nurai_whisper_url') || '';
+  if (!saved) {
+    saved = DEFAULT_HF;
+    localStorage.setItem('nurai_whisper_url', saved);
+  }
   const inp = document.getElementById('shzApiUrl');
-  if (inp && saved) { inp.value = saved; checkWhisperStatus(saved); }
+  if (inp) { inp.value = saved; }
+  checkWhisperStatus(saved);
 }
 
 function closeShazam(e){
@@ -4156,16 +4159,14 @@ function stopShazamRec(analyze){
 async function analyzeShazam(blob){
   const apiUrl = (localStorage.getItem('nurai_whisper_url') || '').trim();
 
-  // Jika tidak ada API URL → langsung tunjukkan petunjuk
+  // Auto-set URL default jika belum ada
+  const DEFAULT_HF_URL = 'https://fastnetkesilir-nurai-whisper.hf.space';
   if (!apiUrl) {
-    document.getElementById('shzErr').innerHTML =
-      '⚠️ URL Whisper API belum diisi.<br>Isi kolom URL di atas dengan:<br>' +
-      '<code style="font-size:10px;background:var(--paper2);padding:2px 6px;border-radius:4px">' +
-      'https://fastnetkesilir-nurai-whisper.hf.space</code>' +
-      '<br><br>Lalu tap <strong>Test</strong> untuk verifikasi.';
-    document.getElementById('shzErr').style.display = 'block';
-    setShzStatus('URL API belum diisi');
-    return;
+    localStorage.setItem('nurai_whisper_url', DEFAULT_HF_URL);
+    const inp = document.getElementById('shzApiUrl');
+    if(inp) inp.value = DEFAULT_HF_URL;
+    document.getElementById('urlDisplay') && (document.getElementById('urlDisplay').textContent = DEFAULT_HF_URL);
+    return analyzeShazam(blob); // retry dengan URL default
   }
 
   setShzStatus('Mengirim audio ke Whisper AI...', 'var(--jade2)');
