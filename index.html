@@ -4096,26 +4096,61 @@ function setShzStatus(txt, color){
 
 // ── Pre-fetch semua surah agar Shazam bisa cari di semua ──
 async function ensureAllSurahCached(){
-  const allNums = Array.from({length:114},(_,i)=>i+1);
+  // Prioritas 1: surah yang sering dibaca/di-Shazam
+  const priority = [36,67,55,18,2,3,4,5,6,7,10,12,13,14,15,19,20,
+    23,24,25,26,27,28,29,30,31,32,33,34,35,37,38,39,40,
+    41,42,43,44,45,46,47,48,49,50,51,52,53,54,56,57,58,
+    59,60,61,62,63,64,65,66,68,69,70,71,72,73,74,75,76,
+    77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,
+    94,95,96,97,98,99,100,101,102,104,105,106,107];
+  
+  const allNums = [...priority, ...Array.from({length:114},(_,i)=>i+1)
+    .filter(n=>!priority.includes(n))];
+  
   const toFetch = allNums.filter(n => !SURAH_DATA[n] || SURAH_DATA[n].length < 2);
-  if(!toFetch.length){ setShzStatus('Database siap — '+Object.keys(SURAH_DATA).length+' surah ter-load'); return; }
-  setShzStatus('Memuat database... '+Object.keys(SURAH_DATA).length+'/114 surah', 'var(--gold)');
-  for(const n of toFetch){
-    await fetchSurah(n);
-    await new Promise(r=>setTimeout(r,80));
+  
+  if(!toFetch.length){
+    setShzStatus('✅ Database siap — '+Object.keys(SURAH_DATA).length+' surah', 'var(--jade2)');
+    return;
   }
-  setShzStatus('Database siap — 114 surah ter-load', 'var(--jade2)');
+  
+  const total = toFetch.length;
+  let loaded = 0;
+  
+  // Fetch paralel 5 sekaligus untuk kecepatan
+  const chunks = [];
+  for(let i=0; i<toFetch.length; i+=5) chunks.push(toFetch.slice(i,i+5));
+  
+  for(const chunk of chunks){
+    await Promise.all(chunk.map(n => fetchSurah(n)));
+    loaded += chunk.length;
+    const pct = Math.round((Object.keys(SURAH_DATA).length)/114*100);
+    setShzStatus(`Memuat database ${pct}%... (${Object.keys(SURAH_DATA).length}/114 surah)`, 'var(--gold)');
+    await new Promise(r=>setTimeout(r,50));
+  }
+  
+  setShzStatus('✅ Database siap — 114 surah ter-load', 'var(--jade2)');
 }
 
 // ══════════════════════════════════════════════
 // TOGGLE: coba Web Speech API dulu, Whisper sebagai backup
 // ══════════════════════════════════════════════
-function toggleShazam(){
+async function toggleShazam(){
   if(_shzRecording || _shzSpeechRec){ stopAll(); return; }
 
   document.getElementById('shzErr').style.display = 'none';
   document.getElementById('shzRes').style.display = 'none';
   document.getElementById('shzC').classList.add('on');
+
+  // Tunggu Yasin + surah penting ter-load dulu
+  const mustLoad = [36, 67, 55, 18, 2, 3, 4, 5, 6, 7, 10, 19, 20, 36, 78];
+  const missing = mustLoad.filter(n => !SURAH_DATA[n] || SURAH_DATA[n].length < 2);
+  
+  if(missing.length > 0){
+    setShzStatus(`⏳ Memuat ${missing.length} surah penting dulu...`, 'var(--gold)');
+    await Promise.all(missing.map(n => fetchSurah(n)));
+    setShzStatus(`✅ Siap! ${Object.keys(SURAH_DATA).length} surah ter-load`, 'var(--jade2)');
+  }
 
   // Coba Web Speech API (tersedia di Chrome Android)
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -4327,7 +4362,7 @@ function wakeHFSpace(){
 // Algoritma: strip harakat → multi-strategy match
 // ══════════════════════════════════════════════
 function localShazamSearch(rawText){
-  if(!rawText || rawText.trim().length < 3){
+  if(!rawText || rawText.trim().length < 2){
     showShzError('Teks terlalu pendek. Baca minimal satu ayat dengan jelas.');
     return;
   }
@@ -4335,13 +4370,14 @@ function localShazamSearch(rawText){
   const loadedCount = Object.keys(SURAH_DATA).length;
   setShzStatus(`Mencari di ${loadedCount} surah...`, 'var(--jade2)');
 
-  // Normalisasi: hapus harakat, spasi extra, HTML tags
+  // Normalisasi teks Arab - agresif untuk kecocokan lebih baik
   const strip = t => t
-    .replace(/<[^>]*>/g,'')           // hapus HTML
-    .replace(/[\u064B-\u065F\u0670]/g,'') // hapus harakat
-    .replace(/[ٱأإآ]/g,'ا')           // normalkan alif
-    .replace(/ة/g,'ه')                // ta marbuta → ha
-    .replace(/ى/g,'ي')                // alif maqsura → ya
+    .replace(/<[^>]*>/g,'')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06E8]/g,'') // hapus harakat & waqaf
+    .replace(/[ٱأإآٲٳ]/g,'ا')   // normalkan semua bentuk alif
+    .replace(/ة/g,'ه')           // ta marbuta → ha
+    .replace(/[ىئ]/g,'ي')        // alif maqsura & ya hamzah → ya
+    .replace(/[ؤ]/g,'و')          // waw hamzah → waw
     .replace(/\s+/g,' ').trim();
 
   const q = strip(rawText);
@@ -4355,49 +4391,66 @@ function localShazamSearch(rawText){
   let results = [];
 
   Object.entries(SURAH_DATA).forEach(([sNum, ayahs]) => {
+    if(!Array.isArray(ayahs)) return;
     ayahs.forEach(a => {
       const clean = strip(a.ar || '');
       if(!clean) return;
 
       let score = 0;
 
-      // Strategy 1: exact substring (paling kuat)
-      if(clean.includes(q)) score += 100;
+      // Strategy 1: exact full match
+      if(clean === q) score += 200;
 
-      // Strategy 2: semua kata query ada di ayat
+      // Strategy 2: exact substring
+      else if(clean.includes(q)) score += 100;
+      else if(q.includes(clean) && clean.length > 4) score += 80;
+
+      // Strategy 3: semua kata query ada di ayat (urutan tidak penting)
       const matchedWords = qWords.filter(w => clean.includes(w));
-      score += matchedWords.length * 15;
+      score += matchedWords.length * 20;
 
-      // Strategy 3: urutan kata pertama ada di awal ayat
-      if(qWords.length >= 2 && clean.startsWith(qWords[0])) score += 20;
+      // Strategy 4: bonus jika kata pertama query = kata pertama ayat
+      const ayahWords = clean.split(' ');
+      if(qWords[0] && ayahWords[0] === qWords[0]) score += 30;
 
-      // Strategy 4: panjang match berurutan
-      let streak = 0, maxStreak = 0;
-      for(let len = 4; len <= Math.min(q.length, 30); len++){
-        if(clean.includes(q.slice(0,len))){ streak = len; maxStreak = len; }
+      // Strategy 5: prefix match berurutan
+      let maxPrefix = 0;
+      for(let len = 3; len <= Math.min(q.length, 40); len++){
+        if(clean.includes(q.slice(0,len))) maxPrefix = len;
         else break;
       }
-      score += maxStreak;
+      score += maxPrefix * 2;
+
+      // Strategy 6: rasio kata yang cocok
+      if(qWords.length > 0){
+        const ratio = matchedWords.length / qWords.length;
+        if(ratio >= 0.8) score += 40;
+        else if(ratio >= 0.5) score += 20;
+      }
 
       if(score >= 15){
-        results.push({surah:parseInt(sNum), ayah:a.num, ar:a.ar, score});
+        results.push({surah:parseInt(sNum), ayah:a.num, ar:a.ar, id:a.id, score});
       }
     });
   });
 
   results.sort((a,b) => b.score - a.score);
 
-  if(results.length > 0){
+  if(results.length > 0 && results[0].score >= 20){
     const best = results[0];
-    const confidence = Math.min(95, best.score);
+    // Confidence berdasarkan gap antara best dan runner-up
+    const gap = results.length > 1 ? best.score - results[1].score : best.score;
+    const confidence = Math.min(95, Math.round(40 + gap/2));
+    
     showShazamResult({
       success: true,
       surah: best.surah,
       ayah: best.ayah,
       transcription: {detected:rawText, similarity_pct:confidence}
     });
-    // Tunjukkan alternatif jika ada
-    if(results.length > 1){
+
+    // Tampilkan alternatif
+    if(results.length > 1 && results[1].score >= 15){
       const alts = results.slice(1,4).map(r=>{
         const sn = SURAHS.find(s=>s.n===r.surah)?.name||'Surah '+r.surah;
         return `${sn} ${r.ayah}`;
@@ -4407,11 +4460,11 @@ function localShazamSearch(rawText){
     }
   } else {
     const hint = loadedCount < 50
-      ? `Baru ${loadedCount} surah ter-load. Tunggu sebentar lalu coba lagi.`
+      ? `⏳ Baru ${loadedCount}/114 surah ter-load. Tunggu sebentar lalu coba lagi.`
       : 'Coba baca lebih lambat dan jelas, atau pastikan surah yang kamu baca sudah dimuat.';
     showShzError(
-      `Ayat tidak ditemukan.<br><br>` +
-      `<span style="font-family:var(--ffa);font-size:15px;direction:rtl;display:block;text-align:right;margin:6px 0">${rawText}</span>` +
+      `Ayat tidak ditemukan di ${loadedCount} surah yang ter-load.<br><br>` +
+      `<span style="font-family:var(--ffa);font-size:15px;direction:rtl;display:block;text-align:right;margin:6px 0;color:var(--jade)">${rawText}</span>` +
       `<span style="font-size:10px;color:var(--ink4)">${hint}</span>`
     );
   }
