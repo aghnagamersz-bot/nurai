@@ -157,7 +157,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 /* ══ MAIN APP ════════════════════════════════════════ */
 .app{display:flex;height:100vh;overflow:hidden;opacity:0;transition:opacity .4s}
 .app.ready{opacity:1}
-.sidebar{width:var(--sw);border-right:1px solid var(--paper3);display:flex;flex-direction:column;flex-shrink:0;background:var(--paper);transition:background .2s}
+.sidebar{width:var(--sw);border-right:1px solid var(--paper3);display:flex;flex-direction:column;flex-shrink:0;background:var(--paper);transition:background .2s;position:relative;z-index:1}
 
 /* Sidebar header */
 .sh{padding:14px 13px 11px;border-bottom:1px solid var(--paper3)}
@@ -664,17 +664,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 /* ══ RESPONSIVE ══════════════════════════════════════ */
 @media(max-width:680px){
   /* ── SIDEBAR ── */
-  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);transition:transform .25s ease;width:82vw;max-width:300px;box-shadow:4px 0 24px rgba(0,0,0,.2)}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:400;transform:translateX(-100%);transition:transform .25s ease;width:82vw;max-width:300px;box-shadow:4px 0 24px rgba(0,0,0,.2)}
   .sidebar.open{transform:translateX(0)}
   .sb-overlay{display:block}
 
   /* ── TOPBAR ── */
-  .hamburger{display:flex}
+  .hamburger{display:flex!important;min-width:38px}
   .topbar{padding:8px 12px;gap:8px;flex-wrap:nowrap;min-height:52px}
   .t-l{min-width:0;flex:1;overflow:hidden}
   .t-nm{font-size:13px;font-weight:700;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  /* Indikator tap untuk ganti surah di mobile */
-  .t-l::after{content:'▾';font-size:12px;color:var(--jade2);margin-left:2px;opacity:.8}
   .t-ar{font-size:16px}
   .pill.p-g{display:none}
   .mode-row{margin-top:3px;gap:5px}
@@ -778,8 +776,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
 }
 
 /* Overlay gelap saat sidebar terbuka */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:299;backdrop-filter:blur(2px)}
-.hamburger{display:none;width:34px;height:34px;border-radius:8px;border:1px solid var(--paper3);background:var(--paper2);cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:4px;flex-shrink:0}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:399;backdrop-filter:blur(2px)}
+.hamburger{display:none;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--paper3);background:var(--paper2);cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:4px;flex-shrink:0;position:relative;z-index:20;-webkit-tap-highlight-color:rgba(46,160,67,.2)}
 .hamburger span{width:16px;height:1.5px;background:var(--ink);border-radius:1px;transition:.2s}
 
 /* ══ PRAYER MINI WIDGET (mobile sticky) ══════════════ */
@@ -950,22 +948,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
   </div>
 </div>
 
-<!-- SURAH PICKER MODAL (mobile bottom sheet) -->
-<div id="surahPickerModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5)" onclick="closeSurahPicker(event)">
-  <div id="surahPickerSheet" style="position:absolute;bottom:0;left:0;right:0;background:var(--paper);border-radius:20px 20px 0 0;max-height:80vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s ease">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--paper3);flex-shrink:0">
-      <div style="font-size:14px;font-weight:700;color:var(--ink)">Pilih Surah</div>
-      <button onclick="closeSurahPicker()" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--paper3);background:var(--paper2);cursor:pointer;font-size:16px;color:var(--ink3);display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
-    <div style="padding:8px 12px;border-bottom:1px solid var(--paper3);flex-shrink:0">
-      <input id="surahPickerSearch" type="text" placeholder="Cari nama atau nomor surah..."
-        style="width:100%;padding:8px 12px;border-radius:20px;border:1px solid var(--paper3);background:var(--paper2);font-size:13px;font-family:var(--ff);color:var(--ink);outline:none"
-        oninput="filterSurahPicker(this.value)">
-    </div>
-    <div id="surahPickerList" style="overflow-y:auto;flex:1;padding:6px 8px 20px"></div>
-  </div>
-</div>
-
 <!-- MAIN APP -->
 <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
 <div class="app" id="mainApp">
@@ -993,7 +975,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
       <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
-      <div class="t-l" onclick="if(window.innerWidth<=680)openSurahPicker()" style="cursor:default">
+      <div class="t-l">
         <div>
           <div style="display:flex;align-items:center;gap:7px">
             <span class="t-ar" id="hAr">الفَاتِحَة</span>
@@ -1307,9 +1289,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
       <span id="shzTimerVal">00:00</span> — Sedang merekam...
     </div>
 
-    <!-- API URL - hidden, auto-detected -->
-    <input id="shzApiUrl" type="hidden" value="https://fastnetkesilir-nurai-whisper.hf.space">
-    <div id="shzApiStatus" style="font-size:9px;margin-top:4px;color:var(--ink4);text-align:center"></div>
+    <!-- API URL config (user isi sekali) -->
+    <div id="shzApiWrap" style="margin-bottom:10px">
+      <div style="font-size:9px;color:var(--ink4);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Whisper API URL (isi sekali)</div>
+      <div style="display:flex;gap:6px">
+        <input id="shzApiUrl" type="text" placeholder="https://USER-nurai-whisper-api.hf.space"
+          style="flex:1;padding:6px 9px;background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--r);font-size:10px;font-family:var(--ff);color:var(--ink);outline:none"
+          oninput="onWhisperUrlChange(this.value.trim())">
+        <button onclick="testWhisperApi()" style="padding:6px 10px;background:var(--jade4);border:1px solid var(--jade5);border-radius:var(--r);font-size:10px;font-family:var(--ff);color:var(--jade2);cursor:pointer;white-space:nowrap">Test</button>
+      </div>
+      <div id="shzApiStatus" style="font-size:9px;margin-top:4px;color:var(--ink4)"></div>
+    </div>
 
     <!-- Result -->
     <div class="shz-res" id="shzRes" style="display:none">
@@ -1322,7 +1312,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
       <!-- Arabic text -->
       <div class="shz-ar" id="shzAr"></div>
       <!-- What was heard -->
-      <div id="shzHeard" style="font-size:10px;color:var(--ink4);margin:6px 0 4px;font-style:italic;direction:rtl;text-align:right"></div>
+      <div id="shzHeard" style="font-size:10px;color:var(--ink4);margin:6px 0 2px;font-style:italic;direction:rtl;text-align:right"></div>
+      <div id="shzAlt" style="display:none;font-size:9px;color:var(--ink4);margin-bottom:4px;font-style:italic"></div>
       <!-- Info + actions -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
         <div id="shzInfo" style="font-size:11px;font-weight:600;color:var(--ink)"></div>
@@ -1668,9 +1659,787 @@ const SURAH_DATA_EXT = {
     {num:5,ar:'الَّذِي يُوَسْوِسُ فِي صُدُورِ <span class="mad ghunnah">النَّاسِ</span>',id:'yang membisikkan (kejahatan) ke dalam dada manusia,',rules:['mad','ghunnah','idgham']},
     {num:6,ar:'مِنَ <span class="mad">الْجِنَّةِ</span> وَالنَّاسِ',id:'dari (golongan) jin dan manusia."',rules:['mad','ghunnah']},
   ],
-,
-,
-,
+  // 36: di-fetch dari API (data lengkap)
+  // 67: di-fetch dari API (data lengkap)
+  // 55: di-fetch dari API (data lengkap)
+  // 18: di-fetch dari API (data lengkap)
+};
+
+// Override SURAH_DATA dengan versi extended
+Object.assign(SURAH_DATA, SURAH_DATA_EXT);
+
+const BADGES=[
+  {ic:'🌱',n:'Mulai Membaca',e:true},{ic:'📖',n:'10 Ayat',e:true},{ic:'⭐',n:'Skor 90+',e:true},
+  {ic:'🔥',n:'3 Hari Streak',e:true},{ic:'🏃',n:'7 Hari Streak',e:true},{ic:'💎',n:'Tajwid 100',e:false},
+  {ic:'🎯',n:'100 Ayat',e:true},{ic:'🌙',n:'Ramadan',e:true},{ic:'🏆',n:'Top 10',e:false},
+  {ic:'📚',n:'Surah Penuh',e:true},{ic:'🎓',n:'Panduan Tamat',e:false},{ic:'🌟',n:'Avg 85',e:false},
+  {ic:'👑',n:'Hafal 3 Surah',e:false},{ic:'🕌',n:'7 Hari Shalat',e:true},{ic:'🧭',n:'Kiblat',e:true},
+  {ic:'🎵',n:'5 Qori',e:false},{ic:'📊',n:'50 Rekam',e:false},{ic:'🌍',n:'Shazam',e:false},
+  {ic:'💪',n:'30 Hari',e:false},{ic:'🕋',n:'Juz 30',e:false},{ic:'✨',n:'All Badge',e:false},
+];
+const LB=[
+  {n:'Ahmad Fauzi',sc:9840,av:'AF',c:'#1abc9c'},{n:'Siti Nur',sc:9210,av:'SN',c:'#3498db'},
+  {n:'Kamu',sc:8750,av:'T',c:'#2a7a4c',me:true},{n:'Budi S.',sc:8430,av:'BS',c:'#9b59b6'},
+  {n:'Rina D.',sc:7980,av:'RD',c:'#e67e22'},{n:'Hasan A.',sc:7540,av:'HA',c:'#e74c3c'},
+  {n:'Fatimah Z.',sc:7120,av:'FZ',c:'#16a085'},
+];
+const PRAYERS=['Subuh','Dzuhur','Ashar','Maghrib','Isya'];
+let PR_TIMES=['04:28','11:45','15:04','17:38','18:53']; // Will be updated dynamically
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const S={dark:false,user:'T',curSurah:1,curAyah:1,mode:'baca',rec:false,recTimer:null,scores:{},hafalan:{},errors:[],qori:0,chapter:0};
+
+// ═══════════════════════════════════════════════
+// TAJWID LAWS DATABASE
+// ═══════════════════════════════════════════════
+const LAWS={
+  mad:{name:'Mad Thabii (مد طبيعي)',arabic:'مد طبيعي',color:'#1a6fc4',panjang:'2 harakat',cara:'Panjangkan suara 2 ketukan. Huruf ا و ي tanpa hamzah/sukun setelahnya.',syarat:'Huruf ا setelah fathah, ي setelah kasrah, و setelah dhammah.',example:'<span style="color:#1a6fc4">قَالَ</span> — <span style="color:#1a6fc4">قِيلَ</span> — <span style="color:#1a6fc4">يَقُولُ</span>',letters:['ا','و','ي']},
+  mad2:{name:'Mad Wajib Muttashil (مد واجب متصل)',arabic:'مد واجب',color:'#2563eb',panjang:'4–5 harakat (WAJIB)',cara:'Huruf mad bertemu hamzah dalam SATU kata — WAJIB dipanjangkan 4-5 ketukan.',syarat:'Mad dan hamzah dalam kata yang sama.',example:'<span style="color:#2563eb">جَاءَ</span> — <span style="color:#2563eb">سَاءَ</span>',letters:['ء']},
+  mad3:{name:'Mad Lazim Mutsaqqal (مد لازم مثقل)',arabic:'مد لازم',color:'#1d4ed8',panjang:'6 harakat (WAJIB)',cara:'Huruf mad bertemu tasydid — WAJIB 6 ketukan penuh, tidak boleh kurang.',syarat:'Tanda tasydid (ّ) langsung setelah huruf mad.',example:'وَلَا <span style="color:#1d4ed8">الضَّالِّين</span>',letters:['ّ']},
+  ghunnah:{name:'Ghunnah (غنّة)',arabic:'غنّة',color:'#d4750a',panjang:'2 harakat (dengung hidung)',cara:'Dengungkan dari rongga hidung 2 ketukan. Mulut tetap posisi huruf, dengung dari hidung.',syarat:'Nun tasydid (نّ) atau Mim tasydid (مّ) di posisi manapun dalam kata.',example:'<span style="color:#d4750a">إِنَّ</span> — <span style="color:#d4750a">ثُمَّ</span> — <span style="color:#d4750a">مِمَّن</span>',letters:['نّ','مّ']},
+  ikhfa:{name:'Ikhfa Haqiqi (إخفاء حقيقي)',arabic:'إخفاء حقيقي',color:'#7b3db0',panjang:'2 harakat (samar)',cara:'Samarkan nun — antara jelas (izhar) dan lebur (idgham). Dengung tetap ada 2 harakat.',syarat:'Nun mati/tanwin bertemu 15 huruf: ت ث ج د ذ ز س ش ص ض ط ظ ف ق ك',example:'<span style="color:#7b3db0">إِن كَانَ</span> — كُنتُم',letters:['ت','ث','ج','د','ذ','ز','س','ش','ص','ض','ط','ظ','ف','ق','ك']},
+  ikhfa2:{name:'Ikhfa Syafawi (إخفاء شفوي)',arabic:'إخفاء شفوي',color:'#9333ea',panjang:'2 harakat (samar bibir)',cara:'Mim samar dengan dengung 2 harakat. Bibir hampir rapat tapi tidak sempurna.',syarat:'Mim mati (مْ) bertemu huruf ب.',example:'<span style="color:#9333ea">هُم بِهِ</span>',letters:['ب']},
+  idgham:{name:'Idgham Bighunnah (إدغام بغنّة)',arabic:'إدغام بغنّة',color:'#1a8c4e',panjang:'2 harakat dengung',cara:'Lebur nun ke huruf berikutnya DENGAN dengung 2 harakat dari hidung. Terasa menyatu.',syarat:'Nun mati/tanwin bertemu ي ن م و di awal kata berikutnya.',example:'مِن <span style="color:#1a8c4e">نَّعِيمٍ</span> — هُدًى <span style="color:#1a8c4e">وَّرَحمَة</span>',letters:['ي','ن','م','و']},
+  idgham2:{name:'Idgham Bilaghunnah (إدغام بلا غنّة)',arabic:'إدغام بلا غنّة',color:'#15803d',panjang:'Tanpa dengung',cara:'Lebur nun ke huruf berikutnya TANPA dengung, langsung masuk halus dan cepat.',syarat:'Nun mati/tanwin bertemu ل atau ر.',example:'مِن <span style="color:#15803d">رَّبِّهِمْ</span>',letters:['ل','ر']},
+  iqlab:{name:'Iqlab (إقلاب)',arabic:'إقلاب',color:'#dc2626',panjang:'2 harakat (mim samar)',cara:'Ubah nun → mim samar dengan dengung 2 harakat. Bibir hampir bertemu.',syarat:'Nun mati/tanwin bertemu huruf ب.',example:'<span style="color:#dc2626">مِن بَعدِ</span> — سَمِيعٌ <span style="color:#dc2626">بَصِيرٌ</span>',letters:['ب']},
+  qalqalah:{name:'Qalqalah Kubra (قلقلة كبرى)',arabic:'قلقلة',color:'#8b0000',panjang:'Pantulan kuat saat waqaf',cara:'Pantulkan huruf KUAT saat waqaf (berhenti). Lebih keras dari qalqalah sughra di tengah kata.',syarat:'Huruf قطبجد di akhir ayat/kalimat saat berhenti (waqaf).',example:'وَلَا <span style="color:#8b0000">الضَّالِّين</span> — أَحَ<span style="color:#8b0000">د</span>',letters:['ق','ط','ب','ج','د']},
+  izhar:{name:'Izhar Halqi (إظهار حلقي)',arabic:'إظهار حلقي',color:'#0e7490',panjang:'Jelas — tanpa dengung sama sekali',cara:'Baca nun dengan JELAS total, tanpa sedikit pun dengung. Keluarkan dari tenggorokan.',syarat:'Nun mati/tanwin bertemu 6 huruf tenggorokan: ء هـ ع غ ح خ',example:'مِن <span style="color:#0e7490">هَادٍ</span> — مَن <span style="color:#0e7490">آمَنَ</span>',letters:['ء','هـ','ع','غ','ح','خ']},
+  izhar2:{name:'Izhar Syafawi (إظهار شفوي)',arabic:'إظهار شفوي',color:'#0891b2',panjang:'Jelas — tanpa dengung',cara:'Baca mim mati JELAS dari bibir. Bibir rapat sempurna lalu terlepas dengan jelas.',syarat:'Mim mati (مْ) bertemu huruf selain ب dan م (22 huruf).',example:'<span style="color:#0891b2">عَلَيهِم غَيرِ</span>',letters:['ا','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص']},
+  tafkhim:{name:'Tafkhim (تفخيم) — Tebal',arabic:'تفخيم',color:'#b45309',panjang:'Sifat — bukan panjang',cara:'Angkat pangkal lidah ke langit-langit belakang. Suara terasa berat, penuh, bergema.',syarat:'7 huruf isti\'la wajib tebal: خ ص ض غ ط ق ظ. Lam Allah setelah fathah/dhammah juga tebal.',example:'<span style="color:#b45309">قَالَ</span> — <span style="color:#b45309">صِرَاط</span> — <span style="color:#b45309">طَالِبٌ</span>',letters:['خ','ص','ض','غ','ط','ق','ظ']},
+  tarqiq:{name:'Tarqiq (ترقيق) — Tipis',arabic:'ترقيق',color:'#0369a1',panjang:'Sifat — bukan panjang',cara:'Jangan angkat pangkal lidah. Suara terasa ringan, tipis, tidak bergema. Kebalikan tafkhim.',syarat:'Huruf istifal dibaca tipis. Lam Allah setelah kasrah juga tipis (bِسمِ اللَّهِ).',example:'<span style="color:#0369a1">كِتَابٌ</span> — بِسمِ <span style="color:#0369a1">اللَّهِ</span>',letters:['ك','ل','س','ن','ت']},
+};
+
+function openTjPopup(lawKey, word){
+  const law=LAWS[lawKey];if(!law)return;
+  document.querySelectorAll('.a-text span[data-law]').forEach(s=>s.classList.remove('tapped'));
+  document.querySelectorAll(`.a-text span[data-law="${lawKey}"]`).forEach(s=>{if(s.getAttribute('data-word')===word)s.classList.add('tapped');});
+  document.getElementById('tjBar').style.background=law.color;
+  document.getElementById('tjDot').style.background=law.color;
+  document.getElementById('tjName').textContent=law.name;
+  document.getElementById('tjAr').textContent=law.arabic;
+  document.getElementById('tjWord').innerHTML=word?`<span>Kata yang di-tap: </span>${word}`:'';
+  document.getElementById('tjBody').innerHTML=`
+    <div class="tj-item"><div class="tj-lbl">Panjang Bacaan</div><div class="tj-val"><strong>${law.panjang}</strong></div></div>
+    <div class="tj-item"><div class="tj-lbl">Cara Membaca</div><div class="tj-val">${law.cara}</div></div>
+    <div class="tj-item tj-full"><div class="tj-lbl">Syarat / Ketentuan</div><div class="tj-val">${law.syarat}</div></div>`;
+  document.getElementById('tjEx').innerHTML=`<div style="font-size:9px;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px">Contoh</div><div class="tj-ex-ar">${law.example}</div>`;
+  const ltrsEl=document.getElementById('tjLtrs');
+  if(law.letters&&law.letters.length){
+    ltrsEl.innerHTML=`<div style="font-size:9px;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;width:100%;margin-bottom:4px">Huruf Terkait</div>${law.letters.map(l=>`<div class="tj-ltr">${l}</div>`).join('')}`;
+  } else ltrsEl.innerHTML='';
+  document.getElementById('tjPopup').classList.add('open');
+}
+function closeTjPopup(){
+  document.getElementById('tjPopup').classList.remove('open');
+  document.querySelectorAll('.a-text span[data-law]').forEach(s=>s.classList.remove('tapped'));
+}
+
+// ═══════════════════════════════════════════════
+// ██████╗  ██╗  ██████╗  ███████╗ ██████╗  █████╗ ███████╗███████╗
+// ██╔══██╗ ██║  ██╔══██╗ ██╔════╝ ██╔══██╗██╔══██╗██╔════╝██╔════╝
+// ██████╔╝ ██║  ██████╔╝ █████╗   ██████╔╝███████║███████╗█████╗
+// ██╔══██╗ ██║  ██╔══██╗ ██╔══╝   ██╔══██╗██╔══██║╚════██║██╔══╝
+// ██║  ██║ ██║  ██║  ██║ ███████╗ ██████╔╝██║  ██║███████║███████╗
+// ╚═╝  ╚═╝ ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+//
+// LANGKAH SETUP FIREBASE (baca ini sebelum deploy):
+//
+// 1. Buka https://console.firebase.google.com
+// 2. Klik "Add project" → beri nama "nurai-quran"
+// 3. Disable Google Analytics (opsional) → Create project
+// 4. Di dashboard → klik ikon </> (Web) → daftarkan app "NurAI Web"
+// 5. Centang "Also set up Firebase Hosting" → Register app
+// 6. COPY firebaseConfig yang muncul → paste di bawah (ganti GANTI_INI)
+// 7. Di sidebar Firebase → Authentication → Get started
+//    → Sign-in method → Google → Enable → Save
+// 8. Di sidebar → Firestore Database → Create database → Start in test mode
+// 9. Di "Authorized domains" → tambahkan domain hosting kamu
+// 10. Simpan file, upload ke hosting, buka → Google login akan berjalan!
+//
+// HOSTING GRATIS: firebase deploy --only hosting
+// Atau drag-drop ke https://app.netlify.com/drop
+// ═══════════════════════════════════════════════
+
+// ── FIREBASE CONFIG ── (GANTI dengan config dari console.firebase.google.com)
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyAHLuCdUIJV63TTqO4f97Og4t5wOhIkGHM",
+  authDomain:        "nurai-quran.firebaseapp.com",
+  projectId:         "nurai-quran",
+  storageBucket:     "nurai-quran.firebasestorage.app",
+  messagingSenderId: "901753517513",
+  appId:             "1:901753517513:web:0b6d502536202ae5cea418"
+};
+
+// ── Deteksi apakah Firebase config sudah diisi ──
+const FB_CONFIGURED = !Object.values(FIREBASE_CONFIG).some(v => v.startsWith('GANTI'));
+
+// Firebase modules (loaded dynamically setelah splash)
+let fbApp=null, fbAuth=null, fbDb=null, fbGoogleProvider=null;
+let currentUser = null;
+
+// ── SPLASH STEPS ──
+const SPLASH_STEPS = [
+  {pct:15, lbl:'Memuat surah...'},
+  {pct:35, lbl:'Menyiapkan tajwid...'},
+  {pct:55, lbl:'Menghubungkan Firebase...'},
+  {pct:75, lbl:'Memuat audio qori...'},
+  {pct:90, lbl:'Hampir selesai...'},
+  {pct:100,lbl:'Bismillah...'},
+];
+
+// ── BOOT SEQUENCE ──
+window.addEventListener('load', () => {
+  runSplash();
+});
+
+function runSplash() {
+  const fill = document.getElementById('splashFill');
+  const lbl  = document.getElementById('splashLbl');
+  let i = 0;
+
+  function nextStep() {
+    if (i >= SPLASH_STEPS.length) {
+      setTimeout(hideSplash, 400);
+      return;
+    }
+    const step = SPLASH_STEPS[i++];
+    if (fill) fill.style.width = step.pct + '%';
+    if (lbl)  lbl.textContent  = step.lbl;
+    setTimeout(nextStep, 350);
+  }
+  nextStep();
+
+  // Preload Firebase in background
+  if (FB_CONFIGURED) loadFirebase();
+
+  // Safety: force hide splash after 5 detik maksimal
+  setTimeout(() => {
+    const splash = document.getElementById('splashScreen');
+    if (splash && splash.style.display !== 'none') {
+      hideSplash();
+    }
+  }, 5000);
+}
+
+function hideSplash() {
+  const splash = document.getElementById('splashScreen');
+  splash.classList.add('hiding');
+  setTimeout(() => {
+    splash.style.display = 'none';
+    showLoginScreen();
+  }, 500);
+}
+
+// ── SHOW LOGIN ──
+function showLoginScreen() {
+  const login = document.getElementById('loginOv');
+  login.style.display = 'flex';
+  login.classList.add('visible');
+  updateFbStatus();
+}
+
+// ── FIREBASE LOADER ──
+async function loadFirebase() {
+  try {
+    // Load Firebase SDK from CDN
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+      = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const { getFirestore, doc, setDoc, getDoc, serverTimestamp }
+      = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+    fbApp = initializeApp(FIREBASE_CONFIG);
+    fbAuth = getAuth(fbApp);
+    fbDb   = getFirestore(fbApp);
+    fbGoogleProvider = new GoogleAuthProvider();
+    fbGoogleProvider.addScope('profile');
+    fbGoogleProvider.addScope('email');
+
+    // Auth state listener — auto-login jika sudah pernah login
+    onAuthStateChanged(fbAuth, user => {
+      if (user) {
+        currentUser = user;
+        // User sudah login sebelumnya → skip login screen
+        const loginEl = document.getElementById('loginOv');
+        if (loginEl.style.display !== 'none') {
+          enterApp({
+            uid: user.uid,
+            name: user.displayName || 'Pengguna',
+            email: user.email,
+            photo: user.photoURL,
+            initial: (user.displayName||'U')[0].toUpperCase()
+          });
+        }
+      }
+    });
+
+    // Store Firestore helpers globally
+    window._fbHelpers = { getAuth, GoogleAuthProvider, signInWithPopup,
+      getFirestore, doc, setDoc, getDoc, serverTimestamp, signOut, fbAuth, fbDb };
+
+    updateFbStatus('connected');
+  } catch(e) {
+    console.warn('Firebase load error:', e.message);
+    updateFbStatus('error', e.message);
+  }
+}
+
+// ── UPDATE FIREBASE STATUS BADGE ──
+function updateFbStatus(state, msg) {
+  const dot  = document.getElementById('fbDot');
+  const text = document.getElementById('fbStatusText');
+  if (!dot || !text) return;
+
+  if (!FB_CONFIGURED) {
+    dot.className  = 'fb-dot error';
+    text.textContent = '⚠ Firebase belum dikonfigurasi — tap untuk setup';
+    document.getElementById('fbStatus').style.cursor = 'pointer';
+    document.getElementById('fbStatus').onclick = () => showFirebaseSetup();
+    return;
+  }
+  if (state === 'connected') {
+    dot.className  = 'fb-dot connected';
+    text.textContent = '✓ Firebase terhubung — Google Login aktif';
+  } else if (state === 'error') {
+    dot.className  = 'fb-dot error';
+    text.textContent = 'Firebase error — cek config (tap untuk info)';
+    document.getElementById('fbStatus').onclick = () =>
+      toast('Firebase Error', msg || 'Cek FIREBASE_CONFIG di kode');
+  } else {
+    dot.className  = 'fb-dot connecting';
+    text.textContent = FB_CONFIGURED ? 'Menghubungkan Firebase...' : '⚠ Config belum diisi';
+  }
+}
+
+// ── GOOGLE SIGN IN ──
+async function signInWithGoogle() {
+  if (!FB_CONFIGURED) {
+    showFirebaseSetup();
+    return;
+  }
+  if (!fbAuth || !fbGoogleProvider) {
+    toast('Tunggu sebentar', 'Firebase sedang dimuat, coba lagi...');
+    return;
+  }
+
+  const btn  = document.getElementById('btnGoogle');
+  const text = document.getElementById('googleBtnText');
+  btn.disabled = true;
+  text.innerHTML = '<span style="display:flex;align-items:center;gap:8px"><div class="auth-spinner"></div>Masuk...</span>';
+
+  try {
+    const { signInWithPopup } = window._fbHelpers;
+    const result = await signInWithPopup(fbAuth, fbGoogleProvider);
+    const user   = result.user;
+    currentUser  = user;
+
+    // Save/update user doc in Firestore
+    await saveUserToFirestore(user);
+
+    enterApp({
+      uid: user.uid,
+      name: user.displayName || 'Pengguna',
+      email: user.email,
+      photo: user.photoURL,
+      initial: (user.displayName||'U')[0].toUpperCase()
+    });
+  } catch(e) {
+    btn.disabled = false;
+    text.textContent = 'Masuk dengan Google';
+    if (e.code === 'auth/popup-blocked') {
+      toast('Popup Diblokir', 'Izinkan popup dari browser ini untuk login Google');
+    } else if (e.code === 'auth/cancelled-popup-request') {
+      // User closed popup — silent
+    } else {
+      toast('Login Gagal', e.message || 'Coba lagi atau gunakan mode Tamu');
+    }
+  }
+}
+
+// ── SAVE USER TO FIRESTORE ──
+async function saveUserToFirestore(user) {
+  if (!window._fbHelpers) return;
+  const { doc, setDoc, serverTimestamp, fbDb } = window._fbHelpers;
+  try {
+    await setDoc(doc(fbDb, 'users', user.uid), {
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      lastLogin: serverTimestamp(),
+      platform: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop'
+    }, { merge: true });
+  } catch(e) {
+    console.warn('Firestore write error:', e.message);
+  }
+}
+
+// ── SAVE SCORE TO FIRESTORE ──
+async function saveScoreToFirestore(surah, ayah, score) {
+  if (!window._fbHelpers || !currentUser) return;
+  const { doc, setDoc, serverTimestamp, fbDb } = window._fbHelpers;
+  try {
+    await setDoc(doc(fbDb, 'scores', `${currentUser.uid}_${surah}_${ayah}`), {
+      uid: currentUser.uid, surah, ayah, score,
+      timestamp: serverTimestamp()
+    });
+  } catch(e) {/* silent */}
+}
+
+// ── GUEST LOGIN ──
+function signInAsGuest() {
+  enterApp({ uid: 'guest_'+Date.now(), name:'Tamu', initial:'T', isGuest:true });
+}
+
+// ── ENTER APP ──
+function enterApp(userInfo) {
+  S.user = userInfo.initial;
+  S.uid  = userInfo.uid;
+  S.isGuest = userInfo.isGuest || false;
+
+  // Hide login
+  const loginEl = document.getElementById('loginOv');
+  loginEl.classList.remove('visible');
+  setTimeout(() => { loginEl.style.display = 'none'; }, 400);
+
+  // Update avatar
+  const av = document.getElementById('avEl');
+  if (av) {
+    av.textContent = userInfo.initial;
+    av.title = userInfo.isGuest ? 'Mode Tamu' : userInfo.name;
+  }
+
+  // Show app
+  const app = document.getElementById('mainApp');
+  app.classList.add('ready');
+
+  // Boot app
+  boot();
+
+  const msg = userInfo.isGuest
+    ? 'Mode tamu — progress tidak tersimpan di cloud'
+    : `Selamat datang, ${userInfo.name.split(' ')[0]}!`;
+  toast(userInfo.isGuest ? 'Mode Tamu' : 'Login Berhasil ✓', msg);
+}
+
+// ── FIREBASE SETUP GUIDE (popup) ──
+function showFirebaseSetup() {
+  const html = `
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px" onclick="this.remove()">
+  <div style="background:var(--paper);border-radius:20px;width:min(96vw,560px);max-height:90vh;overflow-y:auto;padding:28px" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:var(--ffd);font-size:22px;font-weight:700;color:var(--ink)">Setup Firebase Login</div>
+      <button onclick="this.closest('[style]').remove()" style="width:28px;height:28px;border-radius:8px;background:var(--paper2);border:1px solid var(--paper3);cursor:pointer;font-size:14px;color:var(--ink3)">✕</button>
+    </div>
+    ${SETUP_STEPS_HTML}
+  </div></div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+const SETUP_STEPS_HTML = `
+<div style="display:flex;flex-direction:column;gap:12px">
+  ${[
+  ['1','Buat Project Firebase','Buka <strong><a href="https://console.firebase.google.com" target="_blank" style="color:var(--jade2)">console.firebase.google.com</a></strong> → klik <strong>Add project</strong> → nama: <code style="background:var(--paper2);padding:1px 6px;border-radius:4px">nurai-quran</code> → Continue → Create project'],
+  ['2','Daftarkan Web App','Di dashboard → klik ikon <code>&lt;/&gt;</code> (Web) → app nickname: <code>NurAI</code> → centang <strong>"Firebase Hosting"</strong> → <strong>Register app</strong>'],
+  ['3','Salin firebaseConfig','Akan muncul kode seperti ini — <strong>salin semua nilai</strong>:<br><pre style="background:#0a1f12;color:#6ee7a0;padding:10px;border-radius:8px;font-size:10px;overflow-x:auto;margin-top:6px">const firebaseConfig = {\n  apiKey: "AIza...",\n  authDomain: "nurai-quran.firebaseapp.com",\n  projectId: "nurai-quran",\n  ...\n};</pre>'],
+  ['4','Paste ke NurAI-App.html','Buka file <code>NurAI-App.html</code> di text editor → cari <code>FIREBASE_CONFIG</code> → ganti setiap nilai <code>GANTI_...</code> dengan nilai dari Firebase'],
+  ['5','Aktifkan Google Sign-In','Firebase Console → <strong>Authentication</strong> → <strong>Get started</strong> → <strong>Sign-in method</strong> → Google → toggle Enable → <strong>Save</strong>'],
+  ['6','Buat Firestore Database','Firebase Console → <strong>Firestore Database</strong> → <strong>Create database</strong> → <strong>Start in test mode</strong> → pilih region terdekat → Done'],
+  ['7','Deploy ke Hosting','Upload file ke <a href="https://app.netlify.com/drop" target="_blank" style="color:var(--jade2)">netlify.com/drop</a> (drag & drop, 10 detik) atau gunakan Firebase Hosting. Tambahkan domain ke <strong>Authorized domains</strong> di Authentication settings'],
+  ['8','Test & Verifikasi','Buka URL hosting → tap "Masuk dengan Google" → popup Google muncul → pilih akun → berhasil masuk → cek Firestore Console: data user tersimpan di collection <code>users</code>'],
+].map(([n,t,d]) => `
+  <div style="display:flex;gap:12px;padding:12px;background:var(--paper2);border-radius:12px;border:1px solid var(--paper3)">
+    <div style="width:26px;height:26px;border-radius:50%;background:var(--jade2);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0">${n}</div>
+    <div><div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px">${t}</div><div style="font-size:11px;color:var(--ink3);line-height:1.6">${d}</div></div>
+  </div>`).join('')}
+  <div style="background:var(--jade4);border:1px solid var(--jade5);border-radius:12px;padding:14px">
+    <div style="font-size:11px;font-weight:700;color:var(--jade2);margin-bottom:6px">⚡ Checklist Pengecekan Manual</div>
+    <div style="font-size:11px;color:var(--jade);line-height:2">
+      ☐ Firebase Console → Authentication → Users → ada user setelah login<br>
+      ☐ Firebase Console → Firestore → collections → ada <code>users</code> dan <code>scores</code><br>
+      ☐ Browser DevTools (F12) → Console → tidak ada error merah Firebase<br>
+      ☐ Login Google → status badge hijau "Firebase terhubung"<br>
+      ☐ Rekam ayat → skor tersimpan → refresh halaman → skor masih ada
+    </div>
+  </div>
+</div>`;
+
+// ── SHOW INSTALL GUIDE & OTHER LEGACY FUNCTIONS ──
+function showInstallGuide(){document.getElementById('installGuide').classList.add('open');}
+function setIgTab(el,tab){
+  document.querySelectorAll('.igt').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  ['android','ios','pc'].forEach(t=>{document.getElementById('ig-'+t).style.display=t===tab?'':'none';});
+}
+function closeInstallGuide(){
+  document.getElementById('installGuide').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+// REKAMAN SUARA REAL + PLAYBACK
+// ═══════════════════════════════════════════════
+let _mediaRec = null, _recChunks = [], _recStream = null;
+let _recBlob = null, _recAudioEl = null, _recPbInterval = null;
+let _isRecordingReal = false;
+
+// startRec defined below with manual-stop logic
+
+function setupPlayback(blob) {
+  // Buat URL untuk playback
+  if (_recAudioEl) { _recAudioEl.pause(); URL.revokeObjectURL(_recAudioEl.src); }
+  _recAudioEl = new Audio(URL.createObjectURL(blob));
+  _recAudioEl.ontimeupdate = updatePbBar;
+  _recAudioEl.onended = () => {
+    stopPbInterval();
+    document.getElementById('playRecIcon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    document.getElementById('playRecBtn').classList.remove('playing');
+    const sc = document.getElementById('scPlayRecBtn');
+    if (sc) sc.textContent = '▶ Dengar Rekaman';
+  };
+  // Tampilkan playback bar
+  document.getElementById('recPlaybackWrap').classList.add('show');
+  document.getElementById('recSub').textContent = '✓ Rekaman tersimpan — tap ▶ untuk dengar suaramu';
+  // Tampilkan tombol di modal skor
+  const sc = document.getElementById('scPlayRecBtn');
+  if (sc) { sc.style.display = ''; sc.textContent = '▶ Dengar Rekaman'; }
+}
+
+function togglePlayRecording() {
+  if (!_recAudioEl) return;
+  if (_recAudioEl.paused) {
+    _recAudioEl.play();
+    document.getElementById('playRecBtn').classList.add('playing');
+    document.getElementById('playRecIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    const sc = document.getElementById('scPlayRecBtn');
+    if (sc) sc.textContent = '⏸ Pause';
+    startPbInterval();
+  } else {
+    _recAudioEl.pause();
+    document.getElementById('playRecBtn').classList.remove('playing');
+    document.getElementById('playRecIcon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    const sc = document.getElementById('scPlayRecBtn');
+    if (sc) sc.textContent = '▶ Dengar Rekaman';
+    stopPbInterval();
+  }
+}
+
+function startPbInterval() {
+  stopPbInterval();
+  _recPbInterval = setInterval(updatePbBar, 100);
+}
+function stopPbInterval() {
+  if (_recPbInterval) { clearInterval(_recPbInterval); _recPbInterval = null; }
+}
+function updatePbBar() {
+  if (!_recAudioEl || !_recAudioEl.duration) return;
+  const pct = (_recAudioEl.currentTime / _recAudioEl.duration) * 100;
+  document.getElementById('recPbFill').style.width = pct + '%';
+  const t = Math.floor(_recAudioEl.currentTime);
+  document.getElementById('recPbTime').textContent = `0:${String(t).padStart(2,'0')}`;
+}
+function seekRecording(e) {
+  if (!_recAudioEl || !_recAudioEl.duration) return;
+  const bar = document.getElementById('recPbBar');
+  const rect = bar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  _recAudioEl.currentTime = pct * _recAudioEl.duration;
+}
+
+// Override finishRec to stop real recorder
+const _origFinishRec = finishRec;
+function finishRec(n) {
+  clearTimeout(S.recTimer); S.rec = false;
+  document.getElementById('recBtn').classList.remove('on');
+  document.getElementById('waveEl').classList.remove('on');
+
+  if (_isRecordingReal && _mediaRec && _mediaRec.state !== 'inactive') {
+    _mediaRec.stop();
+    _recStream?.getTracks().forEach(t => t.stop());
+    _isRecordingReal = false;
+  }
+
+  const sc = Math.floor(68 + Math.random() * 30);
+  S.scores[n] = sc;
+  const surahName = SURAHS.find(x => x.n === S.curSurah)?.name || 'Al-Fatihah';
+  saveScoreToFirestore(surahName, n, sc);
+  const ayahs = getAyahs(), a = ayahs.find(x => x.num === n) || ayahs[0];
+  if (!S.hafalan[n]) S.hafalan[n] = { c: 0 };
+  if (sc >= 75) S.hafalan[n].c = Math.min(3, S.hafalan[n].c + 1);
+  else {
+    S.errors.unshift({ surah: surahName, ayah: n, sc, time: new Date().toLocaleTimeString('id-ID'), rules: a.rules || [] });
+    if (S.errors.length > 30) S.errors.pop();
+  }
+  const nx = n < ayahs.length ? n + 1 : 1; S.curAyah = nx;
+  document.getElementById('recLbl').textContent = `Rekam Ayat ${nx}`;
+  const fbs = [
+    `Ayat ${n}: Mad Thabii pada kata اللَّهِ kurang panjang. Perpanjang 2 harakat.`,
+    `Ayat ${n}: Ghunnah الرَّحِيمِ sudah bagus! Pertahankan dengung 2 harakat.`,
+    `Ayat ${n}: Ikhfa pada نَعبُدُ perlu lebih samar. Jangan terlalu jelas.`,
+    `Ayat ${n}: Qalqalah الضَّالِّينَ perlu lebih mantul saat waqaf.`,
+    `Ayat ${n}: Tafkhim pada الصِّرَاطَ harus tebal, huruf isti\'la.`,
+  ];
+  const fb = fbs[n % fbs.length];
+  speakTTS(fb); renderAyahs();
+  setTimeout(() => showScore(n, sc, fb), 600);
+}
+
+// ═══════════════════════════════════════════════
+// HURUF HIJAIYAH DATA + FUNGSI
+// ═══════════════════════════════════════════════
+const HIJAIYAH = [
+  {id:1,ar:'ا',name:'Alif',latin:'A',makhraj:'Tenggorokan bagian dalam (Jauf)',sifat:'Mad, Munfashil',forms:{iso:'ا',awal:'ا',tengah:'ـا',akhir:'ـا'},harakat:{fathah:'اَ',kasrah:'اِ',dhammah:'اُ',sukun:'اْ',tanwin:'اً'},ex:['أَحَدٌ','أَلَمْ','أَنَا'],notes:'Alif tidak mempunyai harakat sendiri, mengikuti huruf sebelumnya.'},
+  {id:2,ar:'ب',name:'Ba',latin:'B',makhraj:'Dua bibir (Syafatain)',sifat:'Jahr, Syiddah, Istifal, Infitah, Idzlaq',forms:{iso:'ب',awal:'بـ',tengah:'ـبـ',akhir:'ـب'},harakat:{fathah:'بَ',kasrah:'بِ',dhammah:'بُ',sukun:'بْ',tasydid:'بّ'},ex:['بِسمِ','بَعدَ','رَبِّ'],notes:'Huruf qalqalah — dipantulkan saat sukun.'},
+  {id:3,ar:'ت',name:'Ta',latin:'T',makhraj:'Ujung lidah dan pangkal dua gigi atas (Lisan)',sifat:'Hams, Syiddah, Istifal, Infitah, Ishmat',forms:{iso:'ت',awal:'تـ',tengah:'ـتـ',akhir:'ـت'},harakat:{fathah:'تَ',kasrah:'تِ',dhammah:'تُ',sukun:'تْ'},ex:['تَوبَةً','كُنتُم','أَنتَ'],notes:'Salah satu huruf ikhfa haqiqi.'},
+  {id:4,ar:'ث',name:'Tsa',latin:'Ts',makhraj:'Ujung lidah dan ujung dua gigi seri atas',sifat:'Hams, Rakhawah, Istifal, Infitah, Ishmat',forms:{iso:'ث',awal:'ثـ',tengah:'ـثـ',akhir:'ـث'},harakat:{fathah:'ثَ',kasrah:'ثِ',dhammah:'ثُ',sukun:'ثْ'},ex:['ثَلاثَةٌ','الثَّانِي','حَيثُ'],notes:'Diucapkan seperti "th" dalam bahasa Inggris (thin).'},
+  {id:5,ar:'ج',name:'Jim',latin:'J',makhraj:'Tengah lidah dan langit-langit keras (Lisan)',sifat:'Jahr, Syiddah, Istifal, Infitah, Ishmat',forms:{iso:'ج',awal:'جـ',tengah:'ـجـ',akhir:'ـج'},harakat:{fathah:'جَ',kasrah:'جِ',dhammah:'جُ',sukun:'جْ'},ex:['جَنَّةٌ','جَعَلَ','تَجرِي'],notes:'Huruf qalqalah — dipantulkan saat sukun.'},
+  {id:6,ar:'ح',name:'Ha (kecil)',latin:'H',makhraj:'Tengah tenggorokan (Halq)',sifat:'Hams, Rakhawah, Istifal, Infitah, Ishmat',forms:{iso:'ح',awal:'حـ',tengah:'ـحـ',akhir:'ـح'},harakat:{fathah:'حَ',kasrah:'حِ',dhammah:'حُ',sukun:'حْ'},ex:['حَمدٌ','رَحمَةٌ','فَتحٌ'],notes:'Huruf izhar halqi — nun mati/tanwin dibaca jelas.'},
+  {id:7,ar:'خ',name:'Kha',latin:'Kh',makhraj:'Pangkal tenggorokan (Halq)',sifat:'Hams, Rakhawah, Isti\'la, Infitah, Ishmat',forms:{iso:'خ',awal:'خـ',tengah:'ـخـ',akhir:'ـخ'},harakat:{fathah:'خَ',kasrah:'خِ',dhammah:'خُ',sukun:'خْ'},ex:['خَيرٌ','أَخَذَ','شَيخٌ'],notes:'Huruf tafkhim (tebal) karena termasuk huruf isti\'la.'},
+  {id:8,ar:'د',name:'Dal',latin:'D',makhraj:'Ujung lidah dan pangkal dua gigi seri atas',sifat:'Jahr, Syiddah, Istifal, Infitah, Idzlaq',forms:{iso:'د',awal:'د',tengah:'ـد',akhir:'ـد'},harakat:{fathah:'دَ',kasrah:'دِ',dhammah:'دُ',sukun:'دْ'},ex:['دِينٌ','عَبدٌ','أَحَد'],notes:'Huruf qalqalah — dipantulkan saat sukun terutama waqaf.'},
+  {id:9,ar:'ذ',name:'Dzal',latin:'Dz',makhraj:'Ujung lidah dan ujung dua gigi seri atas',sifat:'Jahr, Rakhawah, Istifal, Infitah, Ishmat',forms:{iso:'ذ',awal:'ذ',tengah:'ـذ',akhir:'ـذ'},harakat:{fathah:'ذَ',kasrah:'ذِ',dhammah:'ذُ',sukun:'ذْ'},ex:['ذَلِكَ','إِذا','هَذا'],notes:'Diucapkan seperti "dh" atau "dz" — ujung lidah sedikit keluar.'},
+  {id:10,ar:'ر',name:'Ra',latin:'R',makhraj:'Ujung lidah dan langit-langit mulut',sifat:'Jahr, Bainiyyah, Istifal, Infitah, Idzlaq, Takrir',forms:{iso:'ر',awal:'ر',tengah:'ـر',akhir:'ـر'},harakat:{fathah:'رَ',kasrah:'رِ',dhammah:'رُ',sukun:'رْ'},ex:['رَبِّ','كَرِيمٌ','قَدَر'],notes:'Huruf idgham bilaghunnah — nun mati masuk tanpa dengung.'},
+  {id:11,ar:'ز',name:'Zai',latin:'Z',makhraj:'Ujung lidah dan ujung dua gigi seri bawah',sifat:'Jahr, Rakhawah, Istifal, Infitah, Ishmat, Shafir',forms:{iso:'ز',awal:'ز',tengah:'ـز',akhir:'ـز'},harakat:{fathah:'زَ',kasrah:'زِ',dhammah:'زُ',sukun:'زْ'},ex:['زَكَاةٌ','رِزقٌ','عَزِيزٌ'],notes:'Bunyi "z" seperti dalam bahasa Indonesia.'},
+  {id:12,ar:'س',name:'Sin',latin:'S',makhraj:'Ujung lidah dan ujung dua gigi seri bawah',sifat:'Hams, Rakhawah, Istifal, Infitah, Ishmat, Shafir',forms:{iso:'س',awal:'سـ',tengah:'ـسـ',akhir:'ـس'},harakat:{fathah:'سَ',kasrah:'سِ',dhammah:'سُ',sukun:'سْ'},ex:['سَمِيعٌ','نَاسٌ','يَسِيرٌ'],notes:'Bunyi "s" tipis tanpa desahan.'},
+  {id:13,ar:'ش',name:'Syin',latin:'Sy',makhraj:'Tengah lidah dan langit-langit keras',sifat:'Hams, Rakhawah, Istifal, Infitah, Ishmat, Tafasysyi',forms:{iso:'ش',awal:'شـ',tengah:'ـشـ',akhir:'ـش'},harakat:{fathah:'شَ',kasrah:'شِ',dhammah:'شُ',sukun:'شْ'},ex:['شَمسٌ','عَرشٌ','بِشِيرٌ'],notes:'Seperti "sy" — bunyi yang menyebar di mulut.'},
+  {id:14,ar:'ص',name:'Shad',latin:'Sh',makhraj:'Ujung lidah dan ujung dua gigi seri bawah',sifat:'Hams, Rakhawah, Isti\'la, Ithbaq, Ishmat, Shafir',forms:{iso:'ص',awal:'صـ',tengah:'ـصـ',akhir:'ـص'},harakat:{fathah:'صَ',kasrah:'صِ',dhammah:'صُ',sukun:'صْ'},ex:['صِرَاطٌ','نَصرٌ','خَالِص'],notes:'Huruf tafkhim — dibaca tebal. Seperti "s" tapi lidah naik.'},
+  {id:15,ar:'ض',name:'Dhad',latin:'Dh',makhraj:'Sisi lidah kiri/kanan bertemu gigi geraham atas',sifat:'Jahr, Rakhawah, Isti\'la, Ithbaq, Ishmat',forms:{iso:'ض',awal:'ضـ',tengah:'ـضـ',akhir:'ـض'},harakat:{fathah:'ضَ',kasrah:'ضِ',dhammah:'ضُ',sukun:'ضْ'},ex:['ضَالِّينَ','فَرضٌ','رَوضَةٌ'],notes:'Disebut huruf paling sulit — makhraj unik di sisi lidah.'},
+  {id:16,ar:'ط',name:'Tha',latin:'Th',makhraj:'Ujung lidah dan pangkal gigi seri atas',sifat:'Jahr, Syiddah, Isti\'la, Ithbaq, Ishmat',forms:{iso:'ط',awal:'طـ',tengah:'ـطـ',akhir:'ـط'},harakat:{fathah:'طَ',kasrah:'طِ',dhammah:'طُ',sukun:'طْ'},ex:['طَرِيقٌ','فِطرَةٌ','بَسطٌ'],notes:'Huruf tafkhim dan qalqalah — tebal dan dipantulkan.'},
+  {id:17,ar:'ظ',name:'Dzha',latin:'Zh',makhraj:'Ujung lidah dan ujung gigi seri atas',sifat:'Jahr, Rakhawah, Isti\'la, Ithbaq, Ishmat',forms:{iso:'ظ',awal:'ظـ',tengah:'ـظـ',akhir:'ـظ'},harakat:{fathah:'ظَ',kasrah:'ظِ',dhammah:'ظُ',sukun:'ظْ'},ex:['ظُلمٌ','حَفِظَ','عَظِيمٌ'],notes:'Seperti "dz" tapi tebal/tafkhim karena huruf isti\'la.'},
+  {id:18,ar:'ع',name:'Ain',latin:"'",makhraj:'Tengah tenggorokan (Halq)',sifat:'Jahr, Bainiyyah, Istifal, Infitah, Ishmat',forms:{iso:'ع',awal:'عـ',tengah:'ـعـ',akhir:'ـع'},harakat:{fathah:'عَ',kasrah:'عِ',dhammah:'عُ',sukun:'عْ'},ex:['عَالَمِينَ','نَعبُدُ','سَمِيع'],notes:'Huruf izhar halqi — keluar dari tengah tenggorokan.'},
+  {id:19,ar:'غ',name:'Ghain',latin:'Gh',makhraj:'Pangkal tenggorokan (Halq)',sifat:'Jahr, Rakhawah, Isti\'la, Infitah, Ishmat',forms:{iso:'غ',awal:'غـ',tengah:'ـغـ',akhir:'ـغ'},harakat:{fathah:'غَ',kasrah:'غِ',dhammah:'غُ',sukun:'غْ'},ex:['غَيبٌ','بَغتَةً','صِيَغٌ'],notes:'Seperti bunyi "r" Perancis — dari pangkal tenggorokan.'},
+  {id:20,ar:'ف',name:'Fa',latin:'F',makhraj:'Gigi seri atas dan bibir bawah bagian dalam (Syafatain)',sifat:'Hams, Rakhawah, Istifal, Infitah, Idzlaq',forms:{iso:'ف',awal:'فـ',tengah:'ـفـ',akhir:'ـف'},harakat:{fathah:'فَ',kasrah:'فِ',dhammah:'فُ',sukun:'فْ'},ex:['فَتحٌ','كَفَرَ','خِلَافٌ'],notes:'Seperti "f" dalam bahasa Indonesia.'},
+  {id:21,ar:'ق',name:'Qaf',latin:'Q',makhraj:'Pangkal lidah dan langit-langit lunak',sifat:'Jahr, Syiddah, Isti\'la, Infitah, Ishmat',forms:{iso:'ق',awal:'قـ',tengah:'ـقـ',akhir:'ـق'},harakat:{fathah:'قَ',kasrah:'قِ',dhammah:'قُ',sukun:'قْ'},ex:['قُل','خَلَقَ','حَق'],notes:'Huruf tafkhim dan qalqalah — tebal dan dipantulkan kuat.'},
+  {id:22,ar:'ك',name:'Kaf',latin:'K',makhraj:'Pangkal lidah dan langit-langit keras (Lisan)',sifat:'Hams, Syiddah, Istifal, Infitah, Idzlaq',forms:{iso:'ك',awal:'كـ',tengah:'ـكـ',akhir:'ـك'},harakat:{fathah:'كَ',kasrah:'كِ',dhammah:'كُ',sukun:'كْ'},ex:['كَلِمَةٌ','ذَلِكَ','مَلِك'],notes:'Seperti "k" tapi dari pangkal lidah yang lebih dalam.'},
+  {id:23,ar:'ل',name:'Lam',latin:'L',makhraj:'Ujung lidah dan langit-langit keras (Lisan)',sifat:'Jahr, Bainiyyah, Istifal, Infitah, Idzlaq, Inhiraf',forms:{iso:'ل',awal:'لـ',tengah:'ـلـ',akhir:'ـل'},harakat:{fathah:'لَ',kasrah:'لِ',dhammah:'لُ',sukun:'لْ'},ex:['لَمْ','قُل','اللَّهُ'],notes:'Huruf idgham bilaghunnah. Lam Allah bisa tebal (tafkhim) atau tipis (tarqiq).'},
+  {id:24,ar:'م',name:'Mim',latin:'M',makhraj:'Dua bibir (Syafatain)',sifat:'Jahr, Syiddah, Istifal, Infitah, Idzlaq, Ghunnah',forms:{iso:'م',awal:'مـ',tengah:'ـمـ',akhir:'ـم'},harakat:{fathah:'مَ',kasrah:'مِ',dhammah:'مُ',sukun:'مْ'},ex:['مِنَ','رَحمَةٌ','إِيَّاكَ'],notes:'Mim bertasydid = ghunnah wajib 2 harakat.'},
+  {id:25,ar:'ن',name:'Nun',latin:'N',makhraj:'Ujung lidah, langit-langit keras, dan rongga hidung',sifat:'Jahr, Bainiyyah, Istifal, Infitah, Idzlaq, Ghunnah',forms:{iso:'ن',awal:'نـ',tengah:'ـنـ',akhir:'ـن'},harakat:{fathah:'نَ',kasrah:'نِ',dhammah:'نُ',sukun:'نْ'},ex:['نَعبُدُ','مِنَ','الرَّحمَن'],notes:'Nun bertasydid = ghunnah wajib. Nun mati = hukum nun mati (izhar/idgham/ikhfa/iqlab).'},
+  {id:26,ar:'و',name:'Wau',latin:'W',makhraj:'Dua bibir (Syafatain)',sifat:'Jahr, Liin, Istifal, Infitah, Idzlaq',forms:{iso:'و',awal:'و',tengah:'ـو',akhir:'ـو'},harakat:{fathah:'وَ',kasrah:'وِ',dhammah:'وُ',sukun:'وْ'},ex:['وَحدَهُ','يَقُولُ','هُو'],notes:'Wau mad = dipanjangkan 2 harakat setelah dhammah.'},
+  {id:27,ar:'ه',name:'Ha (besar)',latin:'H',makhraj:'Bawah tenggorokan (Halq)',sifat:'Hams, Rakhawah, Istifal, Infitah, Ishmat',forms:{iso:'ه',awal:'هـ',tengah:'ـهـ',akhir:'ـه'},harakat:{fathah:'هَ',kasrah:'هِ',dhammah:'هُ',sukun:'هْ'},ex:['هُوَ','اللَّهُ','إِلَيه'],notes:'Huruf izhar halqi — keluar dari bawah tenggorokan.'},
+  {id:28,ar:'ي',name:'Ya',latin:'Y',makhraj:'Tengah lidah dan langit-langit keras (Lisan)',sifat:'Jahr, Liin, Istifal, Infitah, Idzlaq',forms:{iso:'ي',awal:'يـ',tengah:'ـيـ',akhir:'ـي'},harakat:{fathah:'يَ',kasrah:'يِ',dhammah:'يُ',sukun:'يْ'},ex:['يَومِ','الدِّينِ','الضَّالِّين'],notes:'Ya mad = dipanjangkan 2 harakat setelah kasrah.'},
+];
+
+const HARAKAT_DATA = [
+  {ar:'َ',name:'Fathah',latin:'A',desc:'Bunyi vokal A pendek. Ditaruh di atas huruf.',ex:'بَ = Ba, كَ = Ka, دَ = Da'},
+  {ar:'ِ',name:'Kasrah',latin:'I',desc:'Bunyi vokal I pendek. Ditaruh di bawah huruf.',ex:'بِ = Bi, كِ = Ki, دِ = Di'},
+  {ar:'ُ',name:'Dhammah',latin:'U',desc:'Bunyi vokal U pendek. Ditaruh di atas huruf.',ex:'بُ = Bu, كُ = Ku, دُ = Du'},
+  {ar:'ْ',name:'Sukun',latin:'(mati)',desc:'Tanda huruf mati/konsonan. Tidak berbunyi vokal.',ex:'بْ = B, كْ = K (berhenti)'},
+  {ar:'ّ',name:'Tasydid (Syaddah)',latin:'(dobel)',desc:'Huruf dibaca dobel/ditekan. Wajib ghunnah jika nun/mim.',ex:'بّ = BB, نّ = NN (ghunnah)'},
+  {ar:'ً',name:'Tanwin Fathah',latin:'AN',desc:'Bunyi AN di akhir kata. Dua fathah.',ex:'كِتَابًا = kitaaban'},
+  {ar:'ٌ',name:'Tanwin Dhammah',latin:'UN',desc:'Bunyi UN di akhir kata. Dua dhammah.',ex:'كِتَابٌ = kitaabun'},
+  {ar:'ٍ',name:'Tanwin Kasrah',latin:'IN',desc:'Bunyi IN di akhir kata. Dua kasrah.',ex:'كِتَابٍ = kitaabin'},
+  {ar:'ٰ',name:'Alif Khanjariyah',latin:'Aa',desc:'Mad panjang tersembunyi. Dipanjangkan 2 harakat.',ex:'رَحمَٰنِ = rahmaani'},
+  {ar:'ۖ',name:'Waqaf Jaiz (ج)',latin:'boleh berhenti',desc:'Boleh berhenti atau lanjut. Tidak wajib.',ex:'Di tengah ayat yang panjang'},
+  {ar:'ۗ',name:'Waqaf Awla (ق)',latin:'lebih baik lanjut',desc:'Lebih baik dilanjutkan tapi boleh berhenti.',ex:'Sambung lebih sempurna'},
+  {ar:'ۘ',name:'Waqaf Lazim (م)',latin:'WAJIB berhenti',desc:'Wajib berhenti di sini. Jika tidak, makna berubah.',ex:'Di Al-Fatihah ada dua tanda م'},
+];
+
+let S_HJ = { selected: null, tab: 'all', mastered: JSON.parse(localStorage.getItem('nurai_hj_mastered') || '[]') };
+
+function renderHijaiyah() {
+  const body = document.getElementById('hjBody'); if (!body) return;
+  const tab = S_HJ.tab;
+  let items = tab === 'huruf' ? HIJAIYAH :
+              tab === 'harakat' ? HARAKAT_DATA :
+              tab === 'mastered' ? HIJAIYAH.filter(h => S_HJ.mastered.includes(h.id)) :
+              [...HIJAIYAH, ...HARAKAT_DATA.slice(0,3)]; // 'all' = huruf + 3 harakat sample
+
+  body.innerHTML = '';
+
+  // Progress bar
+  const masCount = S_HJ.mastered.length;
+  document.getElementById('hjProgFill').style.width = (masCount/28*100)+'%';
+  document.getElementById('hjProgLbl').textContent = masCount+'/28';
+
+  if (tab === 'all' || tab === 'huruf') {
+    const secLbl = document.createElement('div');
+    secLbl.className = 'hj-sec-lbl';
+    secLbl.textContent = '28 Huruf Hijaiyah';
+    body.appendChild(secLbl);
+  }
+
+  // Detail panel
+  const detailEl = document.createElement('div');
+  detailEl.className = 'hj-detail' + (S_HJ.selected ? ' show' : '');
+  detailEl.id = 'hjDetail';
+  if (S_HJ.selected) renderHjDetail(detailEl, S_HJ.selected);
+  body.appendChild(detailEl);
+
+  // Grid
+  const grid = document.createElement('div');
+  grid.className = 'hj-grid';
+
+  const list = (tab === 'harakat') ? HARAKAT_DATA :
+               (tab === 'mastered') ? HIJAIYAH.filter(h=>S_HJ.mastered.includes(h.id)) :
+               HIJAIYAH;
+
+  list.forEach(h => {
+    const isMastered = h.id && S_HJ.mastered.includes(h.id);
+    const isActive = S_HJ.selected?.id === h.id || S_HJ.selected?.name === h.name;
+    const c = document.createElement('div');
+    c.className = 'hj-card' + (isMastered?' mastered':'') + (isActive?' active':'');
+    c.innerHTML = `
+      <div class="hj-star">⭐</div>
+      <div class="hj-num">${h.id||''}</div>
+      <div class="hj-ar">${h.ar}</div>
+      <div class="hj-name">${h.name}</div>
+      <div class="hj-forms">${h.forms ? Object.values(h.forms).slice(0,3).join(' ') : (h.latin||'')}</div>
+    `;
+    c.onclick = () => { S_HJ.selected = h; renderHijaiyah(); };
+    grid.appendChild(c);
+  });
+  body.appendChild(grid);
+
+  if (tab === 'all' || tab === 'harakat') {
+    const secLbl2 = document.createElement('div');
+    secLbl2.className = 'hj-sec-lbl';
+    secLbl2.textContent = 'Harakat & Tanda Baca';
+    body.appendChild(secLbl2);
+    const hGrid = document.createElement('div');
+    hGrid.className = 'hj-grid';
+    HARAKAT_DATA.forEach(h => {
+      const c = document.createElement('div');
+      c.className = 'hj-card' + (S_HJ.selected?.name===h.name?' active':'');
+      c.innerHTML = `<div class="hj-ar" style="font-size:24px">${h.ar}ب</div><div class="hj-name">${h.name}</div><div class="hj-forms" style="font-size:9px">${h.latin}</div>`;
+      c.onclick = () => { S_HJ.selected = h; renderHijaiyah(); };
+      hGrid.appendChild(c);
+    });
+    if (tab === 'harakat') body.appendChild(hGrid);
+  }
+}
+
+function renderHjDetail(el, h) {
+  const isMastered = h.id && S_HJ.mastered.includes(h.id);
+  const isHarakat = !h.forms;
+
+  el.innerHTML = `
+    <div class="hj-detail-top">
+      <div class="hj-big-ar">${h.ar}</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:3px">${h.name} (${h.latin})</div>
+        <div style="font-size:11px;color:var(--ink4);line-height:1.6">${h.makhraj||h.desc||''}</div>
+      </div>
+    </div>
+    ${h.forms ? `
+    <div style="font-size:10px;font-weight:700;color:var(--ink3);margin-bottom:6px">Bentuk Huruf dalam Kata:</div>
+    <div class="hj-forms-row">
+      <div class="hj-form-item"><div class="hj-form-ar">${h.forms.iso}</div><div class="hj-form-lbl">Terpisah</div></div>
+      <div class="hj-form-item"><div class="hj-form-ar">${h.forms.awal}</div><div class="hj-form-lbl">Awal kata</div></div>
+      <div class="hj-form-item"><div class="hj-form-ar">${h.forms.tengah||h.forms.awal}</div><div class="hj-form-lbl">Tengah</div></div>
+      <div class="hj-form-item"><div class="hj-form-ar">${h.forms.akhir}</div><div class="hj-form-lbl">Akhir kata</div></div>
+    </div>` : ''}
+    ${h.sifat ? `<div class="hj-makhraj-box">🫁 <strong>Sifat:</strong> ${h.sifat} &nbsp;·&nbsp; <strong>Makhraj:</strong> ${h.makhraj}</div>` : ''}
+    ${h.ex ? `
+    <div style="font-size:10px;font-weight:700;color:var(--ink3);margin-bottom:6px">Contoh dalam Al-Qur'an:</div>
+    <div class="hj-ex-row">${h.ex.map(w=>`<div class="hj-ex-w" onclick="speakArabic('${w}')">${w}</div>`).join('')}</div>` : ''}
+    ${h.ex && typeof h.ex==='string' ? `<div style="font-size:11px;color:var(--ink3);margin-bottom:8px">${h.ex}</div>` : ''}
+    ${h.notes ? `<div style="font-size:11px;color:var(--jade);background:var(--jade4);border-radius:8px;padding:8px 10px;margin-bottom:10px">💡 ${h.notes}</div>` : ''}
+    <div class="hj-det-acts">
+      <button class="hj-det-btn listen" onclick="speakArabic('${h.ar}')">
+        <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        Dengar Pengucapan
+      </button>
+      ${h.id ? `<button class="hj-det-btn master ${isMastered?'done':''}" onclick="toggleMastered(${h.id})">
+        ${isMastered ? '⭐ Sudah Hafal' : '☆ Tandai Hafal'}
+      </button>` : ''}
+    </div>
+  `;
+}
+
+function setHjTab(el, tab) {
+  document.querySelectorAll('.hj-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  S_HJ.tab = tab;
+  S_HJ.selected = null;
+  renderHijaiyah();
+}
+
+function toggleMastered(id) {
+  const idx = S_HJ.mastered.indexOf(id);
+  if (idx >= 0) S_HJ.mastered.splice(idx, 1);
+  else S_HJ.mastered.push(id);
+  localStorage.setItem('nurai_hj_mastered', JSON.stringify(S_HJ.mastered));
+  renderHijaiyah();
+  toast(idx<0?'⭐ Ditandai Hafal!':'Tanda hafal dihapus', idx<0?'Bagus! Terus semangat belajar.':'Ayo ulangi lagi ya!');
+}
+
+function speakArabic(text) {
+  if ('speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ar-SA'; u.rate = 0.7;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FITUR 1 — WORD BY WORD TERJEMAH
+// ═══════════════════════════════════════════════
+const WBW_DATA = {
+  1: [ // Al-Fatihah
+    {num:1, ar:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ', words:[
+      {ar:'بِسْمِ',latin:'bismi',id:'Dengan nama',root:'اسم',jenis:'Isim (kata benda)',ket:'Huruf Ba = dengan, Ism = nama'},
+      {ar:'اللَّهِ',latin:'allāhi',id:'Allah',root:'أله',jenis:'Isim (nama)',ket:'Nama Tuhan Yang Maha Esa'},
+      {ar:'الرَّحْمَٰنِ',latin:'ar-rahmāni',id:'Yang Maha Pengasih',root:'رحم',jenis:'Isim sifat',ket:'Kasih sayang untuk semua makhluk di dunia'},
+      {ar:'الرَّحِيمِ',latin:'ar-rahīmi',id:'Yang Maha Penyayang',root:'رحم',jenis:'Isim sifat',ket:'Kasih sayang khusus orang beriman di akhirat'},
+    ]},
+    {num:2, ar:'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ', words:[
+      {ar:'الْحَمْدُ',latin:'al-hamdu',id:'Segala puji',root:'حمد',jenis:'Isim (kata benda)',ket:'Pujian yang mencakup semua kebaikan'},
+      {ar:'لِلَّهِ',latin:'lillāhi',id:'bagi Allah',root:'أله',jenis:'Jar majrur',ket:'Huruf Lam = bagi/milik, ditambah nama Allah'},
+      {ar:'رَبِّ',latin:'rabbi',id:'Tuhan/Pemelihara',root:'ربب',jenis:'Isim (kata benda)',ket:'Pemilik, penguasa, pemelihara'},
+      {ar:'الْعَالَمِينَ',latin:'al-ālamīna',id:'seluruh alam',root:'علم',jenis:'Isim jamak',ket:'Semua yang ada selain Allah — manusia, jin, hewan, tumbuhan'},
+    ]},
+    {num:3, ar:'الرَّحْمَٰنِ الرَّحِيمِ', words:[
+      {ar:'الرَّحْمَٰنِ',latin:'ar-rahmāni',id:'Yang Maha Pengasih',root:'رحم',jenis:'Isim sifat',ket:'Pengulangan untuk penekanan — Allah Maha Pengasih'},
+      {ar:'الرَّحِيمِ',latin:'ar-rahīmi',id:'Yang Maha Penyayang',root:'رحم',jenis:'Isim sifat',ket:'Kasih sayang yang kekal dan sempurna'},
+    ]},
+    {num:4, ar:'مَالِكِ يَوْمِ الدِّينِ', words:[
+      {ar:'مَالِكِ',latin:'māliki',id:'Pemilik/Raja',root:'ملك',jenis:'Isim fa\'il',ket:'Yang memiliki dan menguasai sepenuhnya'},
+      {ar:'يَوْمِ',latin:'yawmi',id:'hari',root:'يوم',jenis:'Isim (kata benda)',ket:'Hari — dikhususkan untuk hari kiamat'},
+      {ar:'الدِّينِ',latin:'ad-dīni',id:'pembalasan',root:'دين',jenis:'Isim (kata benda)',ket:'Agama, ketaatan, juga berarti pembalasan/perhitungan'},
+    ]},
+    {num:5, ar:'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ', words:[
+      {ar:'إِيَّاكَ',latin:'iyyāka',id:'hanya kepada Engkau',root:'—',jenis:'Dhamir (kata ganti)',ket:'Kata ganti orang kedua — Engkau. Posisi di awal = penekanan'},
+      {ar:'نَعْبُدُ',latin:'na\'budu',id:'kami menyembah',root:'عبد',jenis:'Fi\'il mudhori\' (kata kerja)',ket:'Ibadah = ketundukan total dengan penuh cinta dan pengagungan'},
+      {ar:'وَإِيَّاكَ',latin:'wa-iyyāka',id:'dan hanya kepada Engkau',root:'—',jenis:'Waw athaf + dhamir',ket:'Waw = dan, pengulangan untuk penegasan'},
+      {ar:'نَسْتَعِينُ',latin:'nasta\'īnu',id:'kami memohon pertolongan',root:'عون',jenis:'Fi\'il mudhori\'',ket:'Meminta tolong — hanya Allah yang bisa menolong sungguh-sungguh'},
+    ]},
+    {num:6, ar:'اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ', words:[
+      {ar:'اهْدِنَا',latin:'ihdinā',id:'tunjukkanlah kami',root:'هدى',jenis:'Fi\'il amr (kata perintah)',ket:'Hidayah = petunjuk. Na = kami. Ini doa paling agung dalam Quran'},
+      {ar:'الصِّرَاطَ',latin:'aṣ-ṣirāṭa',id:'jalan',root:'صرط',jenis:'Isim maf\'ul',ket:'Jalan besar yang lurus dan jelas'},
+      {ar:'الْمُسْتَقِيمَ',latin:'al-mustaqīma',id:'yang lurus',root:'قوم',jenis:'Isim fa\'il (sifat)',ket:'Tegak lurus, tidak bengkok — jalan Islam yang benar'},
+    ]},
+    {num:7, ar:'صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ', words:[
+      {ar:'صِرَاطَ',latin:'ṣirāṭa',id:'jalan',root:'صرط',jenis:'Isim (badal)',ket:'Penjelas dari jalan yang dimaksud di ayat sebelumnya'},
+      {ar:'الَّذِينَ',latin:'alladhīna',id:'orang-orang yang',root:'—',jenis:'Isim maushul',ket:'Kata sambung — menghubungkan ke sifat mereka'},
+      {ar:'أَنْعَمْتَ',latin:'an\'amta',id:'Engkau telah memberi nikmat',root:'نعم',jenis:'Fi\'il madhi (kata kerja lampau)',ket:'Nikmat = segala kebaikan dari Allah. Ta = kamu (Allah)'},
+      {ar:'عَلَيْهِمْ',latin:'\'alayhim',id:'kepada mereka',root:'—',jenis:'Jar majrur',ket:'\'Ala = atas/kepada, Him = mereka (para nabi, shiddiqin, syuhada, shalihin)'},
+    ]},
+  ],
+  112: [ // Al-Ikhlas
+    {num:1, ar:'قُلْ هُوَ اللَّهُ أَحَدٌ', words:[
+      {ar:'قُلْ',latin:'qul',id:'Katakanlah',root:'قول',jenis:'Fi\'il amr',ket:'Perintah kepada Nabi ﷺ — dan juga kepada kita semua'},
+      {ar:'هُوَ',latin:'huwa',id:'Dia',root:'—',jenis:'Dhamir',ket:'Kata ganti orang ketiga — merujuk kepada Allah'},
+      {ar:'اللَّهُ',latin:'allāhu',id:'Allah',root:'أله',jenis:'Isim',ket:'Nama khusus Tuhan Yang Maha Esa, tidak untuk selain-Nya'},
+      {ar:'أَحَدٌ',latin:'aḥadun',id:'Yang Maha Esa',root:'أحد',jenis:'Isim sifat',ket:'Ahad = satu yang mutlak, tidak ada yang serupa sama sekali'},
+    ]},
+    {num:2, ar:'اللَّهُ الصَّمَدُ', words:[
+      {ar:'اللَّهُ',latin:'allāhu',id:'Allah',root:'أله',jenis:'Mubtada (subyek)',ket:'Allah sebagai pokok kalimat'},
+      {ar:'الصَّمَدُ',latin:'aṣ-ṣamadu',id:'Yang Maha Dibutuhkan',root:'صمد',jenis:'Khabar (predikat)',ket:'Ash-Shamad = yang semua makhluk bergantung kepadanya, tidak bergantung pada apapun'},
+    ]},
+    {num:3, ar:'لَمْ يَلِدْ وَلَمْ يُولَدْ', words:[
+      {ar:'لَمْ',latin:'lam',id:'tidak/belum',root:'—',jenis:'Huruf nafi (penegasian)',ket:'Menjazm fi\'il mudhori — menegasikan secara mutlak'},
+      {ar:'يَلِدْ',latin:'yalid',id:'beranak',root:'ولد',jenis:'Fi\'il mudhori\' majzum',ket:'Walada = melahirkan. Allah tidak beranak'},
+      {ar:'وَلَمْ',latin:'wa-lam',id:'dan tidak',root:'—',jenis:'Waw + huruf nafi',ket:'Pengulangan untuk memperkuat penegasian'},
+      {ar:'يُولَدْ',latin:'yūlad',id:'diperanakkan',root:'ولد',jenis:'Fi\'il mudhori\' majhul',ket:'Diperanakkan (pasif). Allah tidak dilahirkan dari apapun'},
+    ]},
+    {num:4, ar:'وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ', words:[
+      {ar:'وَلَمْ',latin:'wa-lam',id:'dan tidak',root:'—',jenis:'Waw + huruf nafi',ket:'Penegasian ketiga dalam satu surah'},
+      {ar:'يَكُن',latin:'yakun',id:'ada',root:'كون',jenis:'Fi\'il mudhori\' (kana)',ket:'Kana = ada/adalah. Majzum oleh lam'},
+      {ar:'لَّهُ',latin:'lahu',id:'bagi-Nya',root:'—',jenis:'Jar majrur',ket:'Lam = bagi, Hu = Dia (Allah)'},
+      {ar:'كُفُوًا',latin:'kufuwan',id:'yang setara/sebanding',root:'كفأ',jenis:'Khabar (predikat)',ket:'Kufu = yang sepadan, setara, seimbang'},
+      {ar:'أَحَدٌ',latin:'aḥadun',id:'seorang pun',root:'أحد',jenis:'Isim (subyek)',ket:'Tidak ada satupun makhluk yang sebanding dengan Allah'},
+    ]},
+  ],
 };
 
 let wbwActiveWord = null;
@@ -2172,11 +2941,21 @@ function getLocalFallback(msg) {
 // ═══════════════════════════════════════════════
 const QURAN_CACHE_KEY = 'nurai_quran_v4';
 
-// Bersihkan SEMUA cache surah lama
+// Bersihkan cache surah yang tidak lengkap (versi lama mungkin parsial)
 (()=>{
   const keys = Object.keys(localStorage).filter(k => k.startsWith('nurai_surah_') || k.startsWith('nurai_quran_'));
-  keys.forEach(k => localStorage.removeItem(k));
-  console.log('Cache cleared:', keys.length, 'items');
+  keys.forEach(k => {
+    try {
+      const data = JSON.parse(localStorage.getItem(k) || '[]');
+      const surahNum = parseInt(k.replace('nurai_surah_',''));
+      // Hapus cache jika jumlah ayat tidak sesuai ekspektasi
+      const expectedMin = {36:80, 67:28, 55:75, 18:100, 2:280, 3:195, 4:170};
+      if (expectedMin[surahNum] && data.length < expectedMin[surahNum]) {
+        localStorage.removeItem(k);
+        console.log('Cleared incomplete cache for surah', surahNum, '(had', data.length, 'ayat)');
+      }
+    } catch(e) { localStorage.removeItem(k); }
+  });
 })();
 const QURAN_API = 'https://api.quran.com/api/v4';
 
@@ -2254,79 +3033,39 @@ async function getAyahsAsync(surahNum) {
 
 // Pre-fetch surah yang sering dipakai saat idle
 async function prefetchPopularSurahs() {
-  const popular = [1,2,18,36,55,56,67,78,87,93,94,95,96,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
+  // Surah paling sering dicari + semua Juz 30 (juz amma)
+  const popular = [
+    1,2,3,18,19,20,36,55,56,67,78,79,80,81,82,83,84,85,86,87,88,89,90,
+    91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,
+    110,111,112,113,114
+  ];
   for (const n of popular) {
-    if (!SURAH_DATA[n]) {
+    if (!SURAH_DATA[n] || (SURAH_DATA[n].length < 3 && n !== 108 && n !== 103 && n !== 110)) {
       await fetchSurah(n);
-      await new Promise(r => setTimeout(r, 200)); // Jeda agar tidak spam API
+      await new Promise(r => setTimeout(r, 150));
     }
   }
+  console.log('[NurAI] Prefetch selesai:', Object.keys(SURAH_DATA).length, 'surah ter-cache');
 }
 
 // ── MOBILE SIDEBAR ──────────────────────────────
 function toggleSidebar(){
   const sb = document.querySelector('.sidebar');
-  const ov = document.getElementById('sbOverlay');
-  const isOpen = sb.classList.contains('open');
-  if(isOpen){ closeSidebar(); }
-  else { sb.classList.add('open'); ov.style.display = 'block'; }
+  if (!sb) return;
+  if(sb.classList.contains('open')){ closeSidebar(); }
+  else {
+    sb.classList.add('open');
+    const ov = document.getElementById('sbOverlay');
+    if(ov){ ov.style.display='block'; ov.style.zIndex='299'; }
+    document.body.style.overflow = 'hidden'; // prevent body scroll
+  }
 }
 function closeSidebar(){
-  document.querySelector('.sidebar')?.classList.remove('open');
+  const sb = document.querySelector('.sidebar');
+  if(sb) sb.classList.remove('open');
   const ov = document.getElementById('sbOverlay');
-  if(ov) ov.style.display = 'none';
-}
-
-// ── MOBILE SURAH PICKER (bottom sheet) ───────────
-function openSurahPicker(){
-  const modal = document.getElementById('surahPickerModal');
-  const sheet = document.getElementById('surahPickerSheet');
-  modal.style.display = 'block';
-  renderSurahPickerList(SURAHS);
-  // Clear search
-  const inp = document.getElementById('surahPickerSearch');
-  if(inp) inp.value = '';
-  // Animate in
-  setTimeout(() => { sheet.style.transform = 'translateY(0)'; }, 10);
-}
-function closeSurahPicker(e){
-  if(e && e.target !== document.getElementById('surahPickerModal') && e.target !== document.getElementById('surahPickerSheet')) return;
-  const sheet = document.getElementById('surahPickerSheet');
-  const modal = document.getElementById('surahPickerModal');
-  sheet.style.transform = 'translateY(100%)';
-  setTimeout(() => { modal.style.display = 'none'; }, 300);
-}
-function renderSurahPickerList(list){
-  const el = document.getElementById('surahPickerList');
-  el.innerHTML = '';
-  list.forEach(s => {
-    const d = document.createElement('div');
-    d.style.cssText = `display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:10px;cursor:pointer;transition:.15s;${s.n === S.curSurah ? 'background:var(--jade4)' : ''}`;
-    d.innerHTML = `
-      <div style="width:36px;height:36px;border-radius:50%;background:${s.n===S.curSurah?'var(--jade2)':'var(--paper3)'};display:grid;place-items:center;font-size:11px;font-weight:700;color:${s.n===S.curSurah?'#fff':'var(--ink3)'};flex-shrink:0">${s.n}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--ink)">${s.name}</div>
-        <div style="font-size:10px;color:var(--ink4)">${s.info}</div>
-      </div>
-      <div style="font-family:var(--ffa);font-size:18px;color:var(--jade2)">${s.ar}</div>`;
-    d.onmouseenter = () => d.style.background = 'var(--paper2)';
-    d.onmouseleave = () => d.style.background = s.n===S.curSurah?'var(--jade4)':'';
-    d.onclick = () => {
-      pickSurah(s.n);
-      closeSurahPicker();
-    };
-    el.appendChild(d);
-  });
-}
-function filterSurahPicker(q){
-  if(!q){ renderSurahPickerList(SURAHS); return; }
-  const ql = q.toLowerCase();
-  const filtered = SURAHS.filter(s =>
-    s.name.toLowerCase().includes(ql) ||
-    s.ar.includes(q) ||
-    String(s.n).includes(q)
-  );
-  renderSurahPickerList(filtered);
+  if(ov){ ov.style.display='none'; }
+  document.body.style.overflow = '';
 }
 
 function boot(){
@@ -2928,10 +3667,16 @@ function peekHaf(n){
 // RECORDING
 // ═══════════════════════════════════════════════
 function recAyah(n){
+  // Jika sedang rekam ayat lain, stop dulu
+  if(S.rec) finishRec(S.curAyah);
   S.curAyah=n;
   document.querySelectorAll('.ab').forEach(x=>x.classList.remove('rec-on'));
   const e=document.getElementById('ab'+n);if(e)e.classList.add('rec-on');
-  startRec();
+  // Scroll rec bar ke view
+  const recBar=document.querySelector('.rec-bar');
+  if(recBar) recBar.scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Mulai rekam
+  setTimeout(startRec, 100); // delay kecil agar scroll selesai
 }
 // ── LIVE RECORDING TIMER ─────────────────────────────
 let _recLiveTimer = null;
@@ -3027,7 +3772,7 @@ function finishRec(n){
 
   const nx = n < ayahs.length ? n + 1 : 1; S.curAyah = nx;
   document.getElementById('recLbl').textContent = `Rekam Ayat ${nx}`;
-  document.getElementById('recSub').textContent = 'Tekan mikrofon · TTS Indonesia aktif';
+  document.getElementById('recSub').textContent = 'Tap Rekam di tiap ayat, atau tekan tombol mikrofon ini';
 
   const fbs=[
     `Ayat ${n}: Mad Thabii pada kata اللَّهِ kurang panjang. Perpanjang 2 harakat, setara dua ketukan.`,
@@ -3316,26 +4061,25 @@ function closePanel(id){document.getElementById(id).classList.remove('open');}
 let _shzRec = null, _shzChunks = [], _shzStream = null;
 let _shzRecording = false, _shzTimerInt = null, _shzSecs = 0;
 let _shzFoundSurah = null, _shzFoundAyah = null;
+let _shzSpeechRec = null;  // Web Speech API recognition
+
+const HF_URL = 'https://fastnetkesilir-nurai-whisper.hf.space';
 
 function openShazam(){
-  const el = document.getElementById('shzOv');
-  el.classList.add('open');
-  // Auto-gunakan HF_API dari whisper-client atau dari localStorage
-  const apiUrl = (typeof HF_API !== 'undefined' ? HF_API : null) 
-    || localStorage.getItem('nurai_whisper_url') 
-    || 'https://fastnetkesilir-nurai-whisper.hf.space';
+  document.getElementById('shzOv').classList.add('open');
+  localStorage.setItem('nurai_whisper_url', HF_URL);
   const inp = document.getElementById('shzApiUrl');
-  if (inp) { inp.value = apiUrl; }
-  // Auto-check status langsung
-  checkWhisperStatus(apiUrl);
-  // Bangunkan HF jika sleeping
-  fetch(apiUrl + '/health', {signal: AbortSignal.timeout(3000)}).catch(()=>{});
+  if(inp) inp.value = HF_URL;
+  // Cek status HF di background
+  checkWhisperStatus(HF_URL);
+  // Pre-fetch surah yang belum ada agar siap untuk pencarian
+  ensureAllSurahCached();
 }
 
 function closeShazam(e){
   if(!e || e.target === document.getElementById('shzOv')){
-    // Stop recording if active
-    if (_shzRecording) stopShazamRec(false);
+    stopShazamRec(false);
+    stopSpeechRec();
     document.getElementById('shzOv').classList.remove('open');
     document.getElementById('shzC').classList.remove('on');
     document.getElementById('shzRes').style.display = 'none';
@@ -3345,232 +4089,393 @@ function closeShazam(e){
   }
 }
 
-function setShzStatus(txt, color) {
+function setShzStatus(txt, color){
   const el = document.getElementById('shzStatus');
-  if (el) { el.textContent = txt; el.style.color = color || 'var(--ink4)'; }
+  if(el){ el.textContent = txt; el.style.color = color || 'var(--ink4)'; }
 }
 
+// ── Pre-fetch semua surah agar Shazam bisa cari di semua ──
+async function ensureAllSurahCached(){
+  const allNums = Array.from({length:114},(_,i)=>i+1);
+  const toFetch = allNums.filter(n => !SURAH_DATA[n] || SURAH_DATA[n].length < 2);
+  if(!toFetch.length){ setShzStatus('Database siap — '+Object.keys(SURAH_DATA).length+' surah ter-load'); return; }
+  setShzStatus('Memuat database... '+Object.keys(SURAH_DATA).length+'/114 surah', 'var(--gold)');
+  for(const n of toFetch){
+    await fetchSurah(n);
+    await new Promise(r=>setTimeout(r,80));
+  }
+  setShzStatus('Database siap — 114 surah ter-load', 'var(--jade2)');
+}
+
+// ══════════════════════════════════════════════
+// TOGGLE: coba Web Speech API dulu, Whisper sebagai backup
+// ══════════════════════════════════════════════
 function toggleShazam(){
-  if (_shzRecording) {
-    stopShazamRec(true); // stop & analyze
+  if(_shzRecording || _shzSpeechRec){ stopAll(); return; }
+
+  document.getElementById('shzErr').style.display = 'none';
+  document.getElementById('shzRes').style.display = 'none';
+  document.getElementById('shzC').classList.add('on');
+
+  // Coba Web Speech API (tersedia di Chrome Android)
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SpeechRec){
+    startSpeechRecognition(SpeechRec);
   } else {
+    // Fallback: rekam audio → kirim ke Whisper
     startShazamRec();
   }
 }
 
-function startShazamRec(){
-  const apiUrl = 'https://fastnetkesilir-nurai-whisper.hf.space';
-  document.getElementById('shzErr').style.display = 'none';
-  document.getElementById('shzRes').style.display = 'none';
+function stopAll(){
+  stopSpeechRec();
+  stopShazamRec(false);
+  document.getElementById('shzC').classList.remove('on');
+  stopLiveTimer();
+  setShzStatus('Tap tombol lalu baca ayat');
+}
 
-  const btn = document.getElementById('shzC');
-  btn.classList.add('on');
+// ══════════════════════════════════════════════
+// PATH 1: Web Speech API (gratis, offline, real-time)
+// Chrome Android sudah support ar-SA
+// ══════════════════════════════════════════════
+function startSpeechRecognition(SpeechRec){
+  _shzSpeechRec = new SpeechRec();
+  _shzSpeechRec.lang = 'ar-SA';
+  _shzSpeechRec.continuous = true;
+  _shzSpeechRec.interimResults = true;
+  _shzSpeechRec.maxAlternatives = 5;
+
+  startLiveTimer();
+  setShzStatus('🎤 Baca ayat dengan jelas...', 'var(--jade2)');
+
+  let finalText = '';
+  let interimText = '';
+
+  _shzSpeechRec.onresult = (event) => {
+    finalText = '';
+    interimText = '';
+    for(let i = event.resultIndex; i < event.results.length; i++){
+      if(event.results[i].isFinal){
+        finalText += event.results[i][0].transcript;
+      } else {
+        interimText += event.results[i][0].transcript;
+      }
+    }
+    const display = finalText || interimText;
+    if(display){
+      setShzStatus('Terdengar: ' + display.slice(0,30) + (display.length>30?'...':''), 'var(--jade2)');
+    }
+  };
+
+  _shzSpeechRec.onerror = (event) => {
+    console.warn('SpeechRec error:', event.error);
+    if(event.error === 'not-allowed'){
+      showShzError('Izin mikrofon ditolak. Izinkan mikrofon di browser.');
+    } else if(event.error === 'no-speech'){
+      // Tidak ada suara — fallback ke Whisper
+      stopSpeechRec();
+      startShazamRec();
+    } else if(event.error === 'language-not-supported'){
+      // Browser tidak support ar-SA → fallback ke Whisper
+      stopSpeechRec();
+      setShzStatus('Web Speech tidak support Arab → pakai Whisper...', 'var(--gold)');
+      startShazamRec();
+    } else {
+      stopSpeechRec();
+      startShazamRec(); // fallback
+    }
+  };
+
+  _shzSpeechRec.onend = () => {
+    stopLiveTimer();
+    document.getElementById('shzC').classList.remove('on');
+    const text = finalText || interimText;
+    if(text && text.length >= 4){
+      setShzStatus('Menganalisis: "' + text.slice(0,20) + '"...', 'var(--jade2)');
+      localShazamSearch(text);
+    } else if(text){
+      // Teks terlalu pendek → coba Whisper
+      setShzStatus('Teks pendek, coba via Whisper...', 'var(--gold)');
+      startShazamRec();
+    } else {
+      showShzError('Tidak ada teks terdeteksi.<br>Pastikan baca dengan keras & jelas, atau coba lagi.');
+    }
+  };
+
+  try {
+    _shzSpeechRec.start();
+  } catch(e){
+    _shzSpeechRec = null;
+    startShazamRec(); // fallback
+  }
+}
+
+function stopSpeechRec(){
+  if(_shzSpeechRec){
+    try { _shzSpeechRec.stop(); } catch(e){}
+    _shzSpeechRec = null;
+  }
+}
+
+// ══════════════════════════════════════════════
+// PATH 2: Rekam audio → Whisper API
+// ══════════════════════════════════════════════
+function startShazamRec(){
+  document.getElementById('shzC').classList.add('on');
   setShzStatus('Meminta izin mikrofon...', 'var(--jade2)');
 
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
     _shzStream = stream;
     _shzChunks = [];
     _shzRecording = true;
     const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm';
-    _shzRec = new MediaRecorder(stream, { mimeType: mime });
-    _shzRec.ondataavailable = e => { if (e.data.size > 0) _shzChunks.push(e.data); };
-    _shzRec.onstop = () => analyzeShazam(new Blob(_shzChunks, { type: mime }));
+    _shzRec = new MediaRecorder(stream, {mimeType:mime});
+    _shzRec.ondataavailable = e => { if(e.data.size > 0) _shzChunks.push(e.data); };
+    _shzRec.onstop = () => sendToWhisper(new Blob(_shzChunks, {type:mime}));
     _shzRec.start(100);
-
-    // Live timer
-    _shzSecs = 0;
-    document.getElementById('shzTimer').style.display = 'block';
-    _shzTimerInt = setInterval(() => {
-      _shzSecs++;
-      const m = String(Math.floor(_shzSecs/60)).padStart(2,'0');
-      const s = String(_shzSecs%60).padStart(2,'0');
-      document.getElementById('shzTimerVal').textContent = `${m}:${s}`;
-    }, 1000);
-
-    setShzStatus('Baca ayat... tekan lagi untuk berhenti', 'var(--jade2)');
-  }).catch(err => {
-    btn.classList.remove('on');
-    document.getElementById('shzErr').textContent = 'Izin mikrofon ditolak. Izinkan mikrofon di browser lalu coba lagi.';
-    document.getElementById('shzErr').style.display = 'block';
-    setShzStatus('Tap tombol lalu baca ayat');
+    startLiveTimer();
+    setShzStatus('🔴 Baca ayat... tap lagi untuk berhenti', 'var(--jade2)');
+  }).catch(() => {
+    document.getElementById('shzC').classList.remove('on');
+    showShzError('Izin mikrofon ditolak. Izinkan di pengaturan browser.');
   });
 }
 
 function stopShazamRec(analyze){
-  clearInterval(_shzTimerInt);
-  _shzTimerInt = null;
   _shzRecording = false;
-  document.getElementById('shzTimer').style.display = 'none';
-  document.getElementById('shzC').classList.remove('on');
-  if (_shzRec && _shzRec.state !== 'inactive') _shzRec.stop();
-  if (_shzStream) { _shzStream.getTracks().forEach(t => t.stop()); _shzStream = null; }
-  if (!analyze) setShzStatus('Tap tombol lalu baca ayat');
+  if(_shzRec && _shzRec.state !== 'inactive') _shzRec.stop();
+  if(_shzStream){ _shzStream.getTracks().forEach(t=>t.stop()); _shzStream=null; }
+  if(!analyze){ stopLiveTimer(); document.getElementById('shzC').classList.remove('on'); }
 }
 
-async function analyzeShazam(blob){
-  const apiUrl = 'https://fastnetkesilir-nurai-whisper.hf.space';
+// ══════════════════════════════════════════════
+// TIMER LIVE
+// ══════════════════════════════════════════════
+function startLiveTimer(){
+  _shzSecs = 0;
+  document.getElementById('shzTimer').style.display = 'block';
+  clearInterval(_shzTimerInt);
+  _shzTimerInt = setInterval(()=>{
+    _shzSecs++;
+    const m = String(Math.floor(_shzSecs/60)).padStart(2,'0');
+    const s = String(_shzSecs%60).padStart(2,'0');
+    document.getElementById('shzTimerVal').textContent = `${m}:${s}`;
+  },1000);
+}
 
-  setShzStatus('Membangunkan Whisper AI...', 'var(--jade2)');
+function stopLiveTimer(){
+  clearInterval(_shzTimerInt);
+  _shzTimerInt = null;
+  document.getElementById('shzTimer').style.display = 'none';
+}
 
-  // Wake HF Space + cek status
+// ══════════════════════════════════════════════
+// WHISPER API CALL
+// ══════════════════════════════════════════════
+async function sendToWhisper(blob){
+  stopLiveTimer();
+  document.getElementById('shzC').classList.remove('on');
+  setShzStatus('Mengirim ke Whisper AI...', 'var(--jade2)');
+
   try {
-    const health = await fetch(apiUrl + '/health', {
-      signal: AbortSignal.timeout(15000)
-    });
-    if (!health.ok) throw new Error('Space tidak merespons');
-    const hdata = await health.json();
-    // Cek groq ATAU openai
-    if (!hdata.groq_configured && !hdata.openai_configured) {
-      showShzError('Whisper API aktif tapi API key belum dikonfigurasi di HF Space Settings.');
+    // Cek health dulu
+    const health = await fetch(`${HF_URL}/health`, {signal:AbortSignal.timeout(10000)});
+    const hd = await health.json().catch(()=>({}));
+    if(!hd.openai_connected){
+      showShzError('HF Space aktif tapi OpenAI key belum dikonfigurasi.<br>Buka HF Space Settings → Secrets → tambah OPENAI_API_KEY.');
       return;
     }
-  } catch(e) {
-    if (e.name === 'AbortError' || e.name === 'TimeoutError') {
-      showShzError(
-        '⏳ HF Space sedang tidur.<br>' +
-        'Tap tombol ini untuk membangunkan:<br><br>' +
-        `<a href="$https://fastnetkesilir-nurai-whisper.hf.space" target="_blank" style="display:inline-block;background:var(--jade2);color:#fff;padding:6px 14px;border-radius:20px;text-decoration:none;font-size:11px;font-weight:600">Buka & Bangunkan HF Space</a><br><br>` +
-        'Tunggu ~30 detik lalu tap Shazam lagi.'
-      );
+  } catch(e){
+    if(e.name==='TimeoutError' || e.message.includes('fetch')){
+      // Space sleeping → wake it up → tapi tetap tunjukkan hasil lokal dulu
+      wakeHFSpace();
+      showShzError('⏳ HF Space sedang tidur — sedang dibangunkan...<br><br>Coba lagi dalam 30 detik, atau pastikan cron-job.org aktif.');
       return;
     }
   }
 
   // Kirim audio
   try {
-    setShzStatus('Menganalisis bacaan...', 'var(--jade2)');
     const fd = new FormData();
     fd.append('audio', blob, 'shazam.webm');
-    fd.append('surah', '0');
-    fd.append('ayah', '0');
-    fd.append('mode', 'identify');
-
-    const res = await fetch(`${apiUrl}/analyze`, {
-      method: 'POST',
-      body: fd,
-      signal: AbortSignal.timeout(30000)
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(()=>'');
-      throw new Error(`Server ${res.status}: ${errText.slice(0,100)}`);
-    }
-
+    fd.append('surah','0'); fd.append('ayah','0');
+    const res = await fetch(`${HF_URL}/analyze`,{method:'POST',body:fd,signal:AbortSignal.timeout(30000)});
+    if(!res.ok) throw new Error(`Server ${res.status}`);
     const data = await res.json();
-
-    if (data.success && data.transcription?.detected) {
-      // API sukses — tapi kita tetap verifikasi hasilnya masuk akal
-      const detectedSurah = data.surah;
-      const detectedAyah  = data.ayah;
-      if (detectedSurah && detectedSurah > 0 && detectedSurah <= 114) {
+    if(data.success && data.transcription?.detected){
+      if(data.surah && data.surah > 0 && data.surah <= 114){
         showShazamResult(data);
       } else {
-        // Backend tidak return surah/ayah — cari lokal dari teks
         localShazamSearch(data.transcription.detected);
       }
     } else {
-      showShzError('Tidak ada teks Arab yang terdeteksi. Coba baca lebih keras dan jelas.');
+      showShzError('Whisper tidak bisa mendeteksi bacaan. Coba baca lebih keras.');
     }
-
-  } catch(e) {
-    showShzError(`Gagal analisis: ${e.message.slice(0,120)}`);
+  } catch(e){
+    showShzError('Gagal kirim ke Whisper: '+e.message.slice(0,80));
   }
 }
 
-function showShzError(html) {
-  document.getElementById('shzErr').innerHTML = html;
-  document.getElementById('shzErr').style.display = 'block';
-  document.getElementById('shzRes').style.display = 'none';
-  setShzStatus('Gagal — lihat keterangan di bawah');
+// Wake HF Space di background
+function wakeHFSpace(){
+  fetch(HF_URL+'/health',{signal:AbortSignal.timeout(60000)}).catch(()=>{});
 }
 
-function showShazamResult(data){
-  const pct    = data.transcription?.similarity_pct || 0;
-  const heard  = data.transcription?.detected || '';
-  const surah  = data.surah;   // WAJIB ada — tidak boleh fallback ke S.curSurah
-  const ayah   = data.ayah;
-
-  // Validasi — jangan tampilkan hasil yang salah
-  if (!surah || surah < 1 || surah > 114 || !ayah) {
-    showShzError('Hasil tidak valid dari API. Coba rekam ulang dengan bacaan yang lebih jelas.');
+// ══════════════════════════════════════════════
+// LOCAL SEARCH — cari dari semua SURAH_DATA
+// Algoritma: strip harakat → multi-strategy match
+// ══════════════════════════════════════════════
+function localShazamSearch(rawText){
+  if(!rawText || rawText.trim().length < 3){
+    showShzError('Teks terlalu pendek. Baca minimal satu ayat dengan jelas.');
     return;
   }
 
-  _shzFoundSurah = surah;
-  _shzFoundAyah  = ayah;
+  const loadedCount = Object.keys(SURAH_DATA).length;
+  setShzStatus(`Mencari di ${loadedCount} surah...`, 'var(--jade2)');
 
-  const surahName = SURAHS.find(s => s.n === surah)?.name || `Surah ${surah}`;
-  const ayahData  = SURAH_DATA[surah]?.find(a => a.num === ayah);
-  const arText    = ayahData?.ar || heard || '';
+  // Normalisasi: hapus harakat, spasi extra, HTML tags
+  const strip = t => t
+    .replace(/<[^>]*>/g,'')           // hapus HTML
+    .replace(/[\u064B-\u065F\u0670]/g,'') // hapus harakat
+    .replace(/[ٱأإآ]/g,'ا')           // normalkan alif
+    .replace(/ة/g,'ه')                // ta marbuta → ha
+    .replace(/ى/g,'ي')                // alif maqsura → ya
+    .replace(/\s+/g,' ').trim();
 
-  document.getElementById('shzConfBar').style.width  = pct + '%';
-  document.getElementById('shzConfPct').textContent  = pct + '%';
-  document.getElementById('shzAr').innerHTML         = arText;
-  document.getElementById('shzHeard').textContent    = heard ? `"${heard}"` : '';
-  document.getElementById('shzInfo').textContent     = `${surahName} — Ayat ${ayah}`;
-  document.getElementById('shzErr').style.display    = 'none';
-  document.getElementById('shzRes').style.display    = 'block';
-  setShzStatus(`✓ Ditemukan: ${surahName} Ayat ${ayah}`, 'var(--jade2)');
-}
+  const q = strip(rawText);
+  const qWords = q.split(' ').filter(w => w.length >= 2);
 
-function localShazamSearch(arabicText){
-  if (!arabicText || arabicText.length < 4) {
-    showShzError('Teks yang terdengar terlalu pendek. Baca minimal 3-4 kata dengan jelas.');
+  if(qWords.length === 0){
+    showShzError('Tidak bisa memproses teks: "'+rawText+'"');
     return;
   }
 
-  setShzStatus('Mencari di database lokal...', 'var(--gold)');
+  let results = [];
 
-  // Strip harakat untuk perbandingan
-  const strip = t => t.replace(/[ً-ٰٟ]/g,'').replace(/<[^>]*>/g,'').trim();
-  const q = strip(arabicText);
-
-  let best = null, bestScore = 0;
-
-  // Cari di semua SURAH_DATA yang sudah ter-load
   Object.entries(SURAH_DATA).forEach(([sNum, ayahs]) => {
     ayahs.forEach(a => {
       const clean = strip(a.ar || '');
-      if (!clean) return;
+      if(!clean) return;
 
       let score = 0;
-      // Hitung berapa karakter berturut dari query ada di ayat
-      for (let len = 6; len <= q.length; len++) {
-        if (clean.includes(q.slice(0, len))) score = len;
+
+      // Strategy 1: exact substring (paling kuat)
+      if(clean.includes(q)) score += 100;
+
+      // Strategy 2: semua kata query ada di ayat
+      const matchedWords = qWords.filter(w => clean.includes(w));
+      score += matchedWords.length * 15;
+
+      // Strategy 3: urutan kata pertama ada di awal ayat
+      if(qWords.length >= 2 && clean.startsWith(qWords[0])) score += 20;
+
+      // Strategy 4: panjang match berurutan
+      let streak = 0, maxStreak = 0;
+      for(let len = 4; len <= Math.min(q.length, 30); len++){
+        if(clean.includes(q.slice(0,len))){ streak = len; maxStreak = len; }
         else break;
       }
-      // Juga cari substring di mana saja (bukan hanya dari awal)
-      const minLen = Math.min(8, q.length);
-      if (score === 0 && q.length >= minLen) {
-        for (let i = 0; i <= q.length - minLen; i++) {
-          if (clean.includes(q.slice(i, i + minLen))) { score = minLen; break; }
-        }
-      }
+      score += maxStreak;
 
-      if (score > bestScore) {
-        bestScore = score;
-        best = { surah: parseInt(sNum), ayah: a.num, ar: a.ar };
+      if(score >= 15){
+        results.push({surah:parseInt(sNum), ayah:a.num, ar:a.ar, score});
       }
     });
   });
 
-  if (best && bestScore >= 6) {
-    const pct = Math.min(85, Math.round(bestScore / Math.max(q.length, 1) * 100));
+  results.sort((a,b) => b.score - a.score);
+
+  if(results.length > 0){
+    const best = results[0];
+    const confidence = Math.min(95, best.score);
     showShazamResult({
       success: true,
       surah: best.surah,
-      ayah:  best.ayah,
-      transcription: { detected: arabicText, similarity_pct: pct }
+      ayah: best.ayah,
+      transcription: {detected:rawText, similarity_pct:confidence}
     });
+    // Tunjukkan alternatif jika ada
+    if(results.length > 1){
+      const alts = results.slice(1,4).map(r=>{
+        const sn = SURAHS.find(s=>s.n===r.surah)?.name||'Surah '+r.surah;
+        return `${sn} ${r.ayah}`;
+      }).join(', ');
+      const altEl = document.getElementById('shzAlt');
+      if(altEl){ altEl.textContent = 'Mungkin juga: '+alts; altEl.style.display='block'; }
+    }
   } else {
-    // Berikan info yang berguna — bukan hasil yang salah
-    const loadedSurahs = Object.keys(SURAH_DATA).length;
+    const hint = loadedCount < 50
+      ? `Baru ${loadedCount} surah ter-load. Tunggu sebentar lalu coba lagi.`
+      : 'Coba baca lebih lambat dan jelas, atau pastikan surah yang kamu baca sudah dimuat.';
     showShzError(
-      `Ayat tidak ditemukan di ${loadedSurahs} surah yang ter-load.<br><br>` +
-      `Yang terdengar: <span style="font-family:var(--ffa);font-size:14px;direction:rtl">${arabicText}</span><br><br>` +
-      `Pastikan Whisper API aktif untuk pencarian dari seluruh 114 surah, ` +
-      `atau buka surah yang ingin dicari dulu agar ter-cache.`
+      `Ayat tidak ditemukan.<br><br>` +
+      `<span style="font-family:var(--ffa);font-size:15px;direction:rtl;display:block;text-align:right;margin:6px 0">${rawText}</span>` +
+      `<span style="font-size:10px;color:var(--ink4)">${hint}</span>`
     );
+  }
+}
+
+function showShzError(html){
+  document.getElementById('shzErr').innerHTML = html;
+  document.getElementById('shzErr').style.display = 'block';
+  document.getElementById('shzRes').style.display = 'none';
+  setShzStatus('Tidak ditemukan — coba lagi');
+}
+
+function showShazamResult(data){
+  const surah = data.surah, ayah = data.ayah;
+  if(!surah || surah<1 || surah>114 || !ayah){
+    showShzError('Hasil tidak valid. Coba lagi.'); return;
+  }
+  _shzFoundSurah = surah; _shzFoundAyah = ayah;
+
+  const surahName = SURAHS.find(s=>s.n===surah)?.name || `Surah ${surah}`;
+  const ayahData = SURAH_DATA[surah]?.find(a=>a.num===ayah);
+  const arText = ayahData?.ar || data.transcription?.detected || '';
+  const pct = data.transcription?.similarity_pct || 0;
+  const heard = data.transcription?.detected || '';
+
+  document.getElementById('shzConfBar').style.width = Math.min(pct,100)+'%';
+  document.getElementById('shzConfPct').textContent = pct+'%';
+  document.getElementById('shzAr').innerHTML = arText;
+  document.getElementById('shzHeard').textContent = heard ? `"${heard.slice(0,40)}${heard.length>40?'...':''}"` : '';
+  document.getElementById('shzInfo').textContent = `${surahName} — Ayat ${ayah}`;
+  document.getElementById('shzErr').style.display = 'none';
+  document.getElementById('shzRes').style.display = 'block';
+  const altEl = document.getElementById('shzAlt');
+  if(altEl) altEl.style.display = 'none';
+  setShzStatus(`✓ ${surahName} Ayat ${ayah}`, 'var(--jade2)');
+}
+
+async function testWhisperApi(){
+  const url = (document.getElementById('shzApiUrl')?.value||HF_URL).trim();
+  localStorage.setItem('nurai_whisper_url', url);
+  checkWhisperStatus(url);
+}
+
+async function checkWhisperStatus(url){
+  const st = document.getElementById('shzApiStatus');
+  if(!st) return;
+  st.textContent = 'Mengecek...'; st.style.color='var(--ink4)';
+  try {
+    const r = await fetch(`${url}/health`,{signal:AbortSignal.timeout(10000)});
+    const d = await r.json();
+    if(d.status==='ok' && d.openai_connected!==false){
+      st.innerHTML='✓ Whisper siap'; st.style.color='var(--jade2)';
+    } else if(d.status==='ok'){
+      st.innerHTML='⚠ Aktif — OpenAI key belum diset di HF Settings'; st.style.color='var(--gold)';
+    } else {
+      st.textContent='⚠ Server ada masalah'; st.style.color='var(--gold)';
+    }
+  } catch(e){
+    if(e.name==='TimeoutError'){
+      st.innerHTML='😴 Space sedang tidur — cron-job.org aktifkan?'; st.style.color='var(--red)';
+      wakeHFSpace(); // bangunkan di background
+    } else {
+      st.innerHTML='✗ Tidak terhubung'; st.style.color='var(--red)';
+    }
   }
 }
 
