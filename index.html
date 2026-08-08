@@ -1341,6 +1341,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--ff);font-size:14px;line-
       <div class="sb-row"><span>Waqaf & Ibtida</span><span id="sb4">—</span></div>
     </div>
     <div class="sc-fb" id="scFb">—</div>
+    <div style="font-size:9px;color:var(--ink4);margin-top:-6px;margin-bottom:8px" id="scSrc"></div>
     <div class="sc-acts">
       <button style="border:1px solid var(--paper3);background:var(--paper2);color:var(--ink3)" onclick="closeScore()">Tutup</button>
       <button id="scPlayRecBtn" style="border:1px solid var(--jade5);background:var(--jade4);color:var(--jade2);display:none" onclick="togglePlayRecording()">▶ Dengar Rekaman</button>
@@ -2082,6 +2083,8 @@ function closeInstallGuide(){
 let _mediaRec = null, _recChunks = [], _recStream = null;
 let _recBlob = null, _recAudioEl = null, _recPbInterval = null;
 let _isRecordingReal = false;
+// Speech recognition utk penilaian nyata (bukan Shazam) — beda instance dari _shzSpeechRec
+let _recSpeechRec = null, _recTranscriptFinal = '', _recTranscriptInterim = '';
 
 // startRec defined below with manual-stop logic
 
@@ -3698,6 +3701,69 @@ function _stopLiveTimer() {
   _recLiveTimer = null;
 }
 
+// Ambil teks Arab polos suatu ayat (tanpa tag HTML tajwid)
+function _getAyahPlainText(n){
+  const ayahs = getAyahs();
+  const a = ayahs.find(x => x.num === n) || ayahs[0];
+  if(!a || !a.ar) return '';
+  return a.ar.replace(/<[^>]*>/g, ' ');
+}
+
+// Hitung jumlah kata Arab pada suatu ayat (buang tag HTML tajwid dulu)
+function _getAyahWordCount(n){
+  const plain = _getAyahPlainText(n).trim();
+  const words = plain.split(/\s+/).filter(Boolean);
+  return words.length || 4;
+}
+
+// Normalisasi teks Arab supaya bisa dibandingkan (buang harakat, tatweel,
+// samakan variasi huruf) — dipakai untuk membandingkan hasil pengenalan
+// suara user dengan teks ayat asli.
+function _normalizeArabic(text){
+  return (text || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '') // harakat, tatweel, tanda quran
+    .replace(/[إأآٱا]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/[^\u0600-\u06FF\s]/g, '') // buang selain huruf Arab & spasi
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Jarak Levenshtein (dua baris, hemat memori) — dipakai utk skor kemiripan bacaan
+function _levenshtein(a, b){
+  if(a === b) return 0;
+  if(!a.length) return b.length;
+  if(!b.length) return a.length;
+  let prev = new Array(b.length + 1);
+  let curr = new Array(b.length + 1);
+  for(let j = 0; j <= b.length; j++) prev[j] = j;
+  for(let i = 1; i <= a.length; i++){
+    curr[0] = i;
+    for(let j = 1; j <= b.length; j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      curr[j] = Math.min(curr[j-1] + 1, prev[j] + 1, prev[j-1] + cost);
+    }
+    [prev, curr] = [curr, prev];
+  }
+  return prev[b.length];
+}
+
+// Skor kemiripan (0-100) antara teks ayat asli dan hasil pengenalan suara.
+// null jika tidak ada teks yang bisa dibandingkan (mic tidak menangkap apa-apa).
+function _computeSpeechScore(expectedPlain, recognizedRaw){
+  const expNorm = _normalizeArabic(expectedPlain);
+  const recNorm = _normalizeArabic(recognizedRaw);
+  if(!recNorm || recNorm.length < 2) return null;
+  const dist = _levenshtein(expNorm, recNorm);
+  const maxLen = Math.max(expNorm.length, recNorm.length, 1);
+  const similarity = 1 - dist / maxLen;
+  return Math.max(0, Math.min(100, similarity * 100));
+}
+
 function toggleRec(){if(S.rec)finishRec(S.curAyah);else startRec();}
 
 function startRec(){
@@ -3710,6 +3776,10 @@ function startRec(){
 
   // Mulai live timer — TIDAK ADA auto-stop, user yang tentukan kapan berhenti
   _startLiveTimer();
+
+  // Reset transkrip pengenalan suara dari sesi rekam sebelumnya
+  _recTranscriptFinal = '';
+  _recTranscriptInterim = '';
 
   // Coba rekam suara nyata
   if (navigator.mediaDevices?.getUserMedia) {
@@ -3734,6 +3804,53 @@ function startRec(){
   } else {
     _isRecordingReal = false;
   }
+
+  // Jalankan pengenalan suara Arab paralel (utk penilaian nyata, bukan cuma durasi)
+  _startRecSpeechRec();
+}
+
+// Speech recognition paralel khusus utk penilaian bacaan (bukan fitur Shazam)
+function _startRecSpeechRec(){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec) return; // browser tidak support → nanti fallback skor durasi di finishRec
+
+  try {
+    _recSpeechRec = new SpeechRec();
+    _recSpeechRec.lang = 'ar-SA';
+    _recSpeechRec.continuous = true;
+    _recSpeechRec.interimResults = true;
+    _recSpeechRec.maxAlternatives = 1;
+
+    _recSpeechRec.onresult = (event) => {
+      let finalT = '', interimT = '';
+      for(let i = event.resultIndex; i < event.results.length; i++){
+        if(event.results[i].isFinal) finalT += event.results[i][0].transcript + ' ';
+        else interimT += event.results[i][0].transcript;
+      }
+      if(finalT) _recTranscriptFinal += finalT;
+      _recTranscriptInterim = interimT;
+    };
+
+    _recSpeechRec.onerror = () => { /* diamkan — fallback skor durasi tetap tersedia */ };
+    _recSpeechRec.onend = () => {
+      // Kalau masih dalam sesi rekam & belum di-stop manual, coba nyalakan lagi
+      // (SpeechRecognition browser sering auto-stop sendiri walau continuous:true)
+      if(S.rec && _recSpeechRec){
+        try { _recSpeechRec.start(); } catch(e){}
+      }
+    };
+    _recSpeechRec.start();
+  } catch(e){
+    _recSpeechRec = null;
+  }
+}
+
+function _stopRecSpeechRec(){
+  if(_recSpeechRec){
+    const rec = _recSpeechRec;
+    _recSpeechRec = null; // set null dulu supaya onend tidak restart
+    try { rec.stop(); } catch(e){}
+  }
 }
 
 function finishRec(n){
@@ -3750,13 +3867,35 @@ function finishRec(n){
     _isRecordingReal = false;
   }
 
-  // Skor lebih akurat berdasarkan durasi rekaman (min 3 detik untuk skor baik)
+  // Stop pengenalan suara paralel & ambil transkrip yang berhasil ditangkap
+  _stopRecSpeechRec();
+  const recognizedText = (_recTranscriptFinal + ' ' + _recTranscriptInterim).trim();
+
+  // ── Skor NYATA: bandingkan transkrip suara user dengan teks ayat asli ──
   const dur = _recSeconds;
-  let sc;
-  if (dur < 2) {
-    sc = Math.floor(40 + Math.random() * 20); // Terlalu cepat — skor rendah
+  const wordCount = _getAyahWordCount(n);
+  const expectedSec = Math.max(1.5, wordCount * 0.75 + 0.5);
+  const ratio = dur / expectedSec; // 1.0 = durasi wajar utk ayat sepanjang ini
+
+  const expectedPlain = _getAyahPlainText(n);
+  const speechScore = _computeSpeechScore(expectedPlain, recognizedText);
+
+  let sc, scoreSource;
+  if (speechScore !== null) {
+    // Ada transkrip → nilai berdasarkan kemiripan bacaan sesungguhnya
+    scoreSource = 'speech';
+    const durationGuard = Math.min(1, Math.max(0, ratio)); // baca kepotong tetap dibatasi
+    let combined = speechScore * (0.85 + 0.15 * durationGuard);
+    combined += (Math.random() * 6 - 3); // variasi kecil realistis
+    sc = Math.floor(Math.min(98, Math.max(15, combined)));
   } else {
-    sc = Math.floor(68 + Math.random() * 30);
+    // Tidak ada transkrip (browser tak support ar-SA / mic ditolak / tak ada suara)
+    // → tetap pakai estimasi dinamis berbasis durasi & panjang ayat sbg fallback
+    scoreSource = 'duration';
+    let base;
+    if (ratio < 1) base = 28 + ratio * 50;
+    else base = 78 + Math.min(ratio - 1, 0.6) * 30;
+    sc = Math.floor(Math.min(98, Math.max(22, base + (Math.random() * 10 - 5))));
   }
 
   S.scores[n] = sc;
@@ -3781,9 +3920,15 @@ function finishRec(n){
     `Ayat ${n}: Qalqalah الضَّالِّينَ perlu lebih mantul saat waqaf. Pantulan besar di akhir ayat.`,
     `Ayat ${n}: Tafkhim pada الصِّرَاطَ harus tebal karena huruf isti\'la. Naikkan pangkal lidah.`,
   ];
-  const fb = fbs[n % fbs.length];
+  let fb;
+  if (scoreSource === 'speech' && speechScore !== null && speechScore < 55) {
+    // Skor rendah krn kecocokan teks rendah → kemungkinan bacaan belum selesai/kepotong
+    fb = `Ayat ${n}: Bacaan yang terdeteksi baru sebagian dari ayat ini. Coba baca sampai selesai sebelum menekan tombol berhenti.`;
+  } else {
+    fb = fbs[n % fbs.length];
+  }
   speakTTS(fb); renderAyahs();
-  setTimeout(()=>showScore(n, sc, fb), 600);
+  setTimeout(()=>showScore(n, sc, fb, scoreSource), 600);
 }
 function speakTTS(text){
   if('speechSynthesis' in window){
@@ -3791,7 +3936,7 @@ function speakTTS(text){
     u.lang='id-ID';u.rate=0.72;u.pitch=1.0;u.volume=1.0;window.speechSynthesis.cancel();setTimeout(()=>window.speechSynthesis.speak(u),120);
   }
 }
-function showScore(n,sc,fb){
+function showScore(n,sc,fb,scoreSource){
   document.getElementById('scNum').textContent=sc;
   document.getElementById('scTitle').textContent=sc>=85?'Bagus Sekali! 🌟':sc>=70?'Cukup Baik 👍':'Perlu Latihan 📖';
   document.getElementById('scSub').textContent=`Ayat ${n} — ${SURAHS.find(x=>x.n===S.curSurah)?.name||''}`;
@@ -3800,6 +3945,12 @@ function showScore(n,sc,fb){
   document.getElementById('sb3').textContent=Math.round(sc*1.03)+'%';
   document.getElementById('sb4').textContent=Math.round(sc*.97)+'%';
   document.getElementById('scFb').textContent=fb;
+  const srcEl = document.getElementById('scSrc');
+  if(srcEl){
+    srcEl.textContent = scoreSource === 'speech'
+      ? '🎙️ Dinilai dari kecocokan suara dengan teks ayat'
+      : '⏱️ Mic pengenalan suara tak tersedia — skor estimasi dari durasi bacaan';
+  }
   const ring=document.getElementById('scRing');
   ring.style.borderColor=sc>=85?'var(--jade3)':sc>=70?'#f0c030':'#dc2626';
   document.getElementById('scNum').style.color=sc>=85?'var(--jade2)':sc>=70?'#92600a':'#b91c1c';
